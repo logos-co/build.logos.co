@@ -218,7 +218,7 @@ export default function Home() {
                   {/*  PHASE 02: TRY  */}
                   <div className="col-span-6 md:col-span-12 flex items-end gap-4 mt-gutter pb-2">
                     <span className="font-mono text-[3rem] md:text-[4.5rem] leading-none font-light opacity-[0.07] select-none">02</span>
-                    <h3 className="h4 sans pb-1">Try the app or run a node</h3>
+                    <h3 className="h4 sans pb-1">Participate</h3>
                     <div className="flex-1 h-px bg-current opacity-10 mb-3" />
                   </div>
 
@@ -239,7 +239,7 @@ export default function Home() {
                         <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                       </div>
                       <p className="body-tiny opacity-60 mt-2">
-                        The all-in-one Logos experience.
+                        Leverage the interface to the parallel society and test out the applications available in Alpha Release.
                       </p>
                     </div>
                   </Link>
@@ -276,11 +276,11 @@ export default function Home() {
                     </div>
                     <div className="p-gutter">
                       <div className="flex items-baseline justify-between">
-                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Run blockchain node using CLI</span>
+                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Run a Node using CLI</span>
                         <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                       </div>
                       <p className="body-tiny opacity-40 mt-2">
-                        Connect to testnet in minutes.
+                        Participate in the network by becoming a node, and connecting to the testnet in minutes to engage with the protocol.
                       </p>
                     </div>
                   </Link>

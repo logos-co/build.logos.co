@@ -221,9 +221,9 @@ export default function PrizePage({
 export const getStaticProps: GetStaticProps<{ prizes: PrizeData[] }> = async () => {
   try {
     const prizes = await fetchPrizes();
-    return { props: { prizes }, revalidate: 3600 };
+    return { props: { prizes } };
   } catch (err) {
     console.error("Failed to fetch prizes:", err);
-    return { props: { prizes: [] }, revalidate: 60 };
+    return { props: { prizes: [] } };
   }
 };

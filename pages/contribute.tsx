@@ -232,9 +232,9 @@ export const getStaticProps: GetStaticProps<{
     const issues = await fetchGoodFirstIssues();
     const repoSet = new Set(issues.map((i) => i.repo));
     const repos = Array.from(repoSet).sort();
-    return { props: { issues, repos }, revalidate: 1800 };
+    return { props: { issues, repos } };
   } catch (err) {
     console.error("Failed to fetch issues:", err);
-    return { props: { issues: [], repos: [] }, revalidate: 60 };
+    return { props: { issues: [], repos: [] } };
   }
 };
