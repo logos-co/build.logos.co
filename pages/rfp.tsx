@@ -214,9 +214,9 @@ export default function RfpPage({
 export const getStaticProps: GetStaticProps<{ rfps: RfpData[] }> = async () => {
   try {
     const rfps = await fetchRfps();
-    return { props: { rfps }, revalidate: 3600 };
+    return { props: { rfps } };
   } catch (err) {
     console.error("Failed to fetch RFPs:", err);
-    return { props: { rfps: [] }, revalidate: 60 };
+    return { props: { rfps: [] } };
   }
 };
