@@ -22,12 +22,12 @@ const Link = ({
 	...props
 }) => {
 	const { toggleModal } = useAppContext() || {}
-	let childString = false
+	let childString = undefined
 	if (typeof children === 'string') {
 		childString = children
 	}
 
-	let ariaLabel = name || title || childString
+	let ariaLabel = name || title || childString || undefined
 	if (target === '_blank') {
 		ariaLabel = (name || title || childString) + ' - Open in new tab'
 	}

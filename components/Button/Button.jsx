@@ -23,7 +23,7 @@ const Button = ({
 	arrow = false,
 	...props
 }) => {
-	let childString = false
+	let childString = undefined
 	if (typeof children === 'string') {
 		childString = children
 	}
@@ -43,9 +43,9 @@ const Button = ({
 			onClick={onClick}
 			disabled={disabled}
 			style={style}
-			title={title || name || childString}
-			name={name || title || childString}
-			aria-label={name || title || childString}
+			title={title || name || childString || undefined}
+			name={name || title || childString || undefined}
+			aria-label={name || title || childString || undefined}
 			target={target}
 			{...props}
 		>

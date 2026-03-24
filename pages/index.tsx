@@ -96,17 +96,45 @@ function OfficeHoursCard() {
         )
       )}
 
-      <Link
-        to={OFFICE_HOURS_URL}
-        target="_blank"
-        className="mt-auto"
-      >
-        <span style={{ filter: live ? "none" : "blur(3px)", transition: "filter 0.3s" }}>
+      <div className="flex gap-2 mt-auto">
+        {live && (
+          <Link to={OFFICE_HOURS_URL} target="_blank">
+            <Button as="span" arrow>
+              Join Call
+            </Button>
+          </Link>
+        )}
+        <button
+          onClick={() => {
+            const ics = [
+              "BEGIN:VCALENDAR",
+              "VERSION:2.0",
+              "PRODID:-//Logos//Office Hours//EN",
+              "BEGIN:VEVENT",
+              "DTSTART:20250328T130000Z",
+              "DTEND:20250328T140000Z",
+              "RRULE:FREQ=WEEKLY;BYDAY=FR",
+              "SUMMARY:Logos Developer Office Hours",
+              "DESCRIPTION:Weekly office hours with the Logos engineering team.\\nJoin: " + OFFICE_HOURS_URL,
+              "URL:" + OFFICE_HOURS_URL,
+              "END:VEVENT",
+              "END:VCALENDAR",
+            ].join("\r\n");
+            const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "logos-office-hours.ics";
+            a.click();
+            URL.revokeObjectURL(url);
+          }}
+          className="cursor-pointer"
+        >
           <Button as="span" arrow>
-            Join Call
+            Add to Calendar
           </Button>
-        </span>
-      </Link>
+        </button>
+      </div>
     </div>
   );
 }
@@ -115,7 +143,7 @@ function OfficeHoursCard() {
 const SAMPLE_APPS = [
   { name: "Scaffold", desc: "Boilerplate to start building on LEZ.", url: "https://github.com/logos-co/logos-scaffold" },
   { name: "Atomic Swaps", desc: "Trustless cross-chain atomic swap implementation.", url: "https://github.com/logos-co/eth-lez-atomic-swaps" },
-  { name: "Multisig", desc: "Multi-signature module for the Logos execution zone.", url: "https://github.com/jimmy-claw/logos-lez-multisig-module" },
+  { name: "Multisig", desc: "Multi-signature module for the Logos execution zone.", url: "https://github.com/logos-co/lez-multisig" },
 ];
 
 function SampleAppsModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -164,10 +192,65 @@ function SampleAppsModal({ open, onClose }: { open: boolean; onClose: () => void
   );
 }
 
+/* ── Developer Support Modal ── */
+const SUPPORT_LINKS = [
+  { name: "Discord", desc: "Chat with the community and get real-time help.", url: "https://discord.gg/logosnetwork" },
+  { name: "X (Twitter)", desc: "Follow for announcements, updates, and threads.", url: "https://x.com/Logos_network" },
+  { name: "Community Forum", desc: "Discuss research, ask questions, and share ideas.", url: "https://forum.logos.co/" },
+  { name: "Research Forum", desc: "Deep-dive into Logos research topics and technical discussions.", url: "https://forum.research.logos.co/" },
+];
+
+function DevSupportModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  useEffect(() => {
+    if (open) {
+      const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+      document.addEventListener("keydown", onKey);
+      document.body.style.overflow = "hidden";
+      return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+    }
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-margin" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/40" />
+      <div
+        className="relative bg-[var(--color-bg)] rounded-[16px] w-full max-w-[480px] p-8"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <span className="h5 sans">Developer Support</span>
+          <button onClick={onClose} className="cursor-pointer p-1 rounded-full hover:bg-black/5 transition-colors" aria-label="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div className="space-y-3">
+          {SUPPORT_LINKS.map((link) => (
+            <Link
+              key={link.name}
+              to={link.url}
+              target="_blank"
+              className="group flex items-center justify-between p-4 rounded-[10px] border transition-colors hover:bg-main!"
+            >
+              <div>
+                <span className="h6 sans block">{link.name}</span>
+                <p className="body-tiny opacity-50 mt-1">{link.desc}</p>
+              </div>
+              <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-4">&rarr;</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /*  Page  */
 
 export default function Home() {
   const [sampleAppsOpen, setSampleAppsOpen] = useState(false);
+  const [devSupportOpen, setDevSupportOpen] = useState(false);
 
   return (
     <SiteLayout>
@@ -232,13 +315,16 @@ export default function Home() {
             <section className="pt-half-v-space pb-half-v-space theme-default">
               <div className="mx-auto px-margin max-w-site-max-w-margin text-center">
                 <ScrollEntrance>
-                  <span className="inline-flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-full border border-current/20 mb-4">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <span className="group relative inline-flex items-center gap-1.5 text-xs font-mono font-semibold px-3 py-1.5 rounded-full mb-4 cursor-default" style={{ background: "#FF6B2B", color: "#fff" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" fill="none" />
                       <line x1="12" y1="9" x2="12" y2="13" />
                       <line x1="12" y1="17" x2="12.01" y2="17" />
                     </svg>
-                    Testnet
+                    Testnet Live
+                    <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-max max-w-[260px] rounded-lg px-3 py-2 text-xs font-sans font-normal leading-snug text-white bg-black/90 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                      This is a testnet environment and is not production-ready. Expect breaking changes and possible data resets.
+                    </span>
                   </span>
                   <h2 className="h2 text-balance">
                     Logos<br />Builders Hub
@@ -396,7 +482,7 @@ export default function Home() {
                         <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                       </div>
                       <p className="body-tiny opacity-60 mt-2">
-                        Leverage the interface to the parallel society and test out the applications available in Alpha Release.
+                        Leverage the interface to the parallel society and experiment with the applications available in the Alpha Release.
                       </p>
                     </div>
                   </Link>
@@ -437,7 +523,7 @@ export default function Home() {
                         <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                       </div>
                       <p className="body-tiny opacity-40 mt-2">
-                        Participate in the network by becoming a node, and connecting to the testnet in minutes to engage with the protocol.
+                        Participate in the network by becoming a node operator. Connect to the testnet in minutes and engage with the protocol.
                       </p>
                     </div>
                   </Link>
@@ -542,29 +628,25 @@ export default function Home() {
                   </Link>
 
                   {/* Developer support */}
-                  <Link
-                    to="https://discord.gg/logosnetwork"
-                    target="_blank"
-                    className="group col-span-3 md:col-span-4 rounded-[16px] p-gutter flex flex-col justify-between gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[140px]"
+                  <button
+                    onClick={() => setDevSupportOpen(true)}
+                    className="cursor-pointer group col-span-3 md:col-span-4 rounded-[16px] p-gutter flex flex-col justify-between gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[140px] text-left"
                     style={{ background: "var(--color-light-blue)" }}
                   >
-                    <div className="flex items-baseline justify-between">
+                    <div className="flex items-baseline justify-between w-full">
                       <span className="h6 sans transition-transform group-hover:-translate-y-0.5">Developer support</span>
                       <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                     </div>
-                    {/* Discord icon */}
-                    <svg width="28" height="22" viewBox="0 0 71 55" fill="currentColor" className="opacity-20 absolute bottom-4 right-4">
-                      <path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.2a.2.2 0 0 0-.2.1 40.8 40.8 0 0 0-1.8 3.7 54 54 0 0 0-16.2 0A37.4 37.4 0 0 0 25.4.3a.2.2 0 0 0-.2-.1A58.4 58.4 0 0 0 10.6 4.9a.2.2 0 0 0-.1.1C1.5 18.7-.9 32.2.3 45.5v.2a58.9 58.9 0 0 0 17.7 9a.2.2 0 0 0 .3-.1 42.1 42.1 0 0 0 3.6-5.9.2.2 0 0 0-.1-.3 38.8 38.8 0 0 1-5.5-2.7.2.2 0 0 1 0-.4l1.1-.9a.2.2 0 0 1 .2 0 42 42 0 0 0 35.8 0 .2.2 0 0 1 .2 0l1.1.9a.2.2 0 0 1 0 .4 36.4 36.4 0 0 1-5.5 2.7.2.2 0 0 0-.1.3 47.2 47.2 0 0 0 3.6 5.9.2.2 0 0 0 .3.1A58.7 58.7 0 0 0 70.5 45.7v-.2c1.4-15-2.3-28.1-9.8-39.7a.2.2 0 0 0-.1 0ZM23.7 37.3c-3.4 0-6.3-3.2-6.3-7s2.8-7 6.3-7 6.3 3.1 6.3 7-2.8 7-6.3 7Zm23.3 0c-3.4 0-6.3-3.2-6.3-7s2.8-7 6.3-7 6.3 3.1 6.3 7-2.8 7-6.3 7Z" />
-                    </svg>
                     <p className="body-tiny opacity-50">
-                      Discord, office hours, and the research forum.
+                      Discord, X, community forum, and the research forum.
                     </p>
-                  </Link>
+                  </button>
+                  <DevSupportModal open={devSupportOpen} onClose={() => setDevSupportOpen(false)} />
 
-                  {/*  PHASE 04: GET INCUBATED  */}
+                  {/*  PHASE 04: GET SUPPORT  */}
                   <div className="col-span-6 md:col-span-12 flex items-end gap-4 mt-gutter pb-2">
                     <span className="font-mono text-[3rem] md:text-[4.5rem] leading-none font-light opacity-[0.07] select-none">04</span>
-                    <h3 className="h4 sans pb-1">Get Incubated</h3>
+                    <h3 className="h4 sans pb-1">Get Support</h3>
                     <div className="flex-1 h-px bg-current opacity-10 mb-3" />
                   </div>
 
@@ -580,7 +662,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="body-tiny opacity-40 max-w-[24em]">
-                        Compete for prizes by building on the Logos execution layer. Ship code, win funding.
+                        Compete for prizes by building on the Logos execution layer. Ship code, win support.
                       </p>
                     </div>
                     {/* Large mark watermark */}
@@ -611,13 +693,6 @@ export default function Home() {
                     <div className="absolute top-14 right-14 w-24 h-16 rounded-[8px] bg-current/[0.02] transition-transform group-hover:translate-x-1" />
                   </Link>
 
-                  {/*  PHASE 05: GET SUPPORT  */}
-                  <div className="col-span-6 md:col-span-12 flex items-end gap-4 mt-gutter pb-2">
-                    <span className="font-mono text-[3rem] md:text-[4.5rem] leading-none font-light opacity-[0.07] select-none">?</span>
-                    <h3 className="h4 sans pb-1">Get Support</h3>
-                    <div className="flex-1 h-px bg-current opacity-10 mb-3" />
-                  </div>
-
                   {/* Developer Office Hours */}
                   <OfficeHoursCard />
 
@@ -625,85 +700,30 @@ export default function Home() {
                   <Link
                     to="https://cal.com/team/logos-onboarding/intro"
                     target="_blank"
-                    className="group col-span-6 md:col-span-4 rounded-[16px] p-gutter flex flex-row gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[200px] border"
+                    className="group col-span-6 md:col-span-4 rounded-[16px] p-gutter flex flex-col gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[200px] border"
                   >
-                    <div className="flex flex-col justify-between gap-4 flex-1 min-w-0">
-                      <div>
-                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5 block">Speak to a core contributor</span>
-                      </div>
-                      <p className="body-tiny opacity-60">
-                        Get direct guidance from the people building the Logos stack. Book a call with a core contributor.
-                      </p>
+                    <div className="flex items-baseline justify-between">
+                      <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Speak to a core contributor</span>
                       <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                     </div>
-                    {/* Animated video call mockup */}
-                    <div className="flex items-center justify-center shrink-0">
-                      <div className="w-[90px]">
-                        <div className="rounded-[8px] border border-current/10 overflow-hidden bg-current/[0.02] group-hover:bg-current/[0.04] transition-colors">
-                          <div className="flex items-center gap-1 px-2 py-1 border-b border-current/5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-green-500/40 group-hover:bg-green-500/70 transition-colors" />
-                            <span className="text-[8px] opacity-20 font-mono">Live</span>
-                          </div>
-                          <div className="grid grid-cols-2 gap-1 p-2">
-                            {[0,1,2,3].map((i) => (
-                              <div
-                                key={i}
-                                className="aspect-square rounded-[4px] bg-current/[0.04] group-hover:bg-current/[0.08] flex items-center justify-center transition-all group-hover:-translate-y-0.5"
-                                style={{ transitionDelay: `${i * 80}ms` }}
-                              >
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-15 group-hover:opacity-30 transition-opacity" style={{ transitionDelay: `${i * 80}ms` }}>
-                                  <circle cx="12" cy="8" r="4" />
-                                  <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
-                                </svg>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <p className="body-tiny opacity-60 mt-auto">
+                      Get direct guidance from the people building the Logos stack. Book a call with a core contributor.
+                    </p>
                   </Link>
 
                   {/* Logos Community Forum */}
                   <Link
                     to="https://forum.logos.co/"
                     target="_blank"
-                    className="group col-span-6 md:col-span-4 rounded-[16px] p-gutter flex flex-row gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[200px] border"
+                    className="group col-span-6 md:col-span-4 rounded-[16px] p-gutter flex flex-col gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[200px] border"
                   >
-                    <div className="flex flex-col justify-between gap-4 flex-1 min-w-0">
-                      <div>
-                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5 block">Logos community forum</span>
-                      </div>
-                      <p className="body-tiny opacity-60">
-                        Discuss research, ask technical questions, and connect with the broader Logos community.
-                      </p>
+                    <div className="flex items-baseline justify-between">
+                      <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Logos community forum</span>
                       <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                     </div>
-                    {/* Animated forum threads */}
-                    <div className="flex items-center justify-center shrink-0">
-                      <div className="w-[100px] space-y-1.5">
-                        {[
-                          { w: "85%", delay: 0 },
-                          { w: "70%", delay: 80 },
-                          { w: "90%", delay: 160 },
-                          { w: "60%", delay: 240 },
-                        ].map((row, i) => (
-                          <div
-                            key={i}
-                            className="flex items-center gap-1.5 px-1.5 py-1 rounded-[4px] bg-current/[0.02] group-hover:bg-current/[0.05] transition-all group-hover:translate-x-0.5"
-                            style={{ transitionDelay: `${row.delay}ms` }}
-                          >
-                            <div className="w-2.5 h-2.5 rounded-full bg-current/[0.06] group-hover:bg-current/[0.12] shrink-0 transition-colors" style={{ transitionDelay: `${row.delay}ms` }} />
-                            <div
-                              className="h-[3px] rounded-full bg-current/[0.06] group-hover:bg-current/[0.12] transition-colors"
-                              style={{ width: row.w, transitionDelay: `${row.delay}ms` }}
-                            />
-                            <div className="ml-auto flex gap-0.5">
-                              <div className="w-1 h-1 rounded-full bg-current/[0.08] group-hover:bg-teal/30 transition-colors" style={{ transitionDelay: `${row.delay + 100}ms` }} />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                    <p className="body-tiny opacity-60 mt-auto">
+                      Discuss research, ask technical questions, and connect with the broader Logos community.
+                    </p>
                   </Link>
 
                 </ScrollEntrance>
@@ -845,25 +865,6 @@ export default function Home() {
                         <p className="body max-w-[28em]">
                           Logos Basecamp is a complete distribution that bundles the kernel, the default modules, and UI packages into a usable product. It allows the user to easily interact with simple apps built on the various modules.
                         </p>
-                        <div className="my-gutter flex flex-wrap gap-[8px]">
-                          {[
-                            { label: "Wallet", icon: "M21 4H3v16h18V4zM3 8h18" },
-                            { label: "Chat Interface", icon: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" },
-                            { label: "Filesharing Tool", icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6" },
-                            { label: "Explorer", icon: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM2 12h20M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10A15 15 0 0 1 12 2z" },
-                          ].map((item) => (
-                            <span
-                              key={item.label}
-                              className="body sans px-[10px] py-[8px] rounded-full flex gap-[8px] items-center shrink-0"
-                              style={{ background: "var(--color-grey)", boxShadow: "inset 0 0 0 1px rgba(21,37,33,0.06)" }}
-                            >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-40">
-                                <path d={item.icon} />
-                              </svg>
-                              {item.label}
-                            </span>
-                          ))}
-                        </div>
                         <div className="mt-4">
                           <Button
                             to="https://github.com/logos-co/logos-app/releases"
