@@ -6,6 +6,7 @@ export type RfpData = {
   githubUrl: string;
   status: string;
   tier: string;
+  rawMarkdown: string;
 };
 
 export async function parseRfpMarkdown(
@@ -61,7 +62,7 @@ export async function parseRfpMarkdown(
     summary = lines.slice(0, 3).join(" ").slice(0, 200);
   }
 
-  return { number, title, category, summary, githubUrl: htmlUrl, status, tier };
+  return { number, title, category, summary, githubUrl: htmlUrl, status, tier, rawMarkdown: raw };
 }
 
 export async function fetchRfps(): Promise<RfpData[]> {

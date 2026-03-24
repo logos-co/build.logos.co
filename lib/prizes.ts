@@ -7,6 +7,7 @@ export type PrizeData = {
   effort: string;
   prize: string;
   githubUrl: string;
+  rawMarkdown: string;
 };
 
 export async function parsePrizeMarkdown(
@@ -58,7 +59,7 @@ export async function parsePrizeMarkdown(
   );
   const effort = effortMatch?.[1]?.trim() || "";
 
-  return { number, title, status, circle, overview, effort, prize, githubUrl: htmlUrl };
+  return { number, title, status, circle, overview, effort, prize, githubUrl: htmlUrl, rawMarkdown: raw };
 }
 
 export async function fetchPrizes(): Promise<PrizeData[]> {

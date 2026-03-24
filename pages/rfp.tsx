@@ -1,22 +1,27 @@
 import React, { useState } from "react";
 import Head from "next/head";
-import Link from "@components/Link";
 import TextLink from "@components/TextLink";
 import Button from "@components/Button";
 import ScrollEntrance from "@components/ScrollEntrance";
 import SiteLayout from "@components/SiteLayout";
+import MarkdownModal from "@components/MarkdownModal";
 import cx from "classnames";
 import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import { fetchRfps, type RfpData } from "@/lib/rfps";
 
 /* ───────────── RFP Grid Card ────────────────────────────────── */
 
-const RfpCard = ({ rfp }: { rfp: RfpData }) => (
+const RfpCard = ({
+  rfp,
+  onOpen,
+}: {
+  rfp: RfpData;
+  onOpen: (rfp: RfpData) => void;
+}) => (
   <div>
-    <Link
-      to={rfp.githubUrl}
-      target="_blank"
-      className="p-gutter border rounded-[12px] h-full flex flex-col gap-gutter aspect-square transition-[background] hover:bg-main!"
+    <button
+      onClick={() => onOpen(rfp)}
+      className="p-gutter border rounded-[12px] h-full flex flex-col gap-gutter aspect-square transition-[background] hover:bg-main! text-left w-full cursor-pointer"
     >
       <div className="w-full grow space-y-4">
         <div className="flex items-baseline justify-between gap-2">
@@ -48,7 +53,7 @@ const RfpCard = ({ rfp }: { rfp: RfpData }) => (
           <p className="body-tiny max-w-[26em]">{rfp.summary}</p>
         </div>
       )}
-    </Link>
+    </button>
   </div>
 );
 
@@ -57,9 +62,11 @@ const RfpCard = ({ rfp }: { rfp: RfpData }) => (
 const RfpRow = ({
   index,
   rfp,
+  onOpen,
 }: {
   index: number;
   rfp: RfpData;
+  onOpen: (rfp: RfpData) => void;
 }) => (
   <li className={cx("theme-light-grey", { "bg-[#1525210D]!": index % 2 !== 0 })}>
     <div className="px-margin py-gutter flex gap-y-gutter flex-wrap lg:grid lg:grid-cols-12 lg:gap-x-gutter lg:min-h-[70px]">
@@ -87,7 +94,7 @@ const RfpRow = ({
         </div>
       </div>
       <div className="order-4 lg:order-4 lg:col-span-2">
-        <TextLink to={rfp.githubUrl} target="_blank" arrow>
+        <TextLink as="button" onClick={() => onOpen(rfp)} arrow>
           View RFP
         </TextLink>
       </div>
@@ -101,6 +108,7 @@ export default function RfpPage({
   rfps,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [view, setView] = useState<"grid" | "list">("grid");
+  const [modalRfp, setModalRfp] = useState<RfpData | null>(null);
 
   return (
     <SiteLayout>
@@ -137,12 +145,15 @@ export default function RfpPage({
                       RFPs
                     </h1>
                   </div>
-                  <div className="col-span-4 flex items-center">
+                  <div className="col-span-4 flex flex-col justify-center gap-2">
                     <p className="body-tiny max-w-[26em] text-balance">
-                      The Logos RFP Program funds developers to build
+                      The Logos RFP Program supports developers to build
                       applications on the Logos Stack. Browse all open requests
                       for proposals below.
                     </p>
+                    <TextLink to="https://github.com/logos-co/rfp/blob/master/TERMS_AND_CONDITIONS.md" target="_blank" arrow>
+                      Terms and Conditions
+                    </TextLink>
                   </div>
                   <div className="col-span-3 flex items-center justify-end">
                     <Button
@@ -186,7 +197,7 @@ export default function RfpPage({
                 <div className="mx-auto px-margin max-w-site-max-w-margin">
                   <ScrollEntrance className="grid gap-x-gutter gap-y-v-space-sm grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
                     {rfps.map((rfp) => (
-                      <RfpCard key={rfp.number} rfp={rfp} />
+                      <RfpCard key={rfp.number} rfp={rfp} onOpen={setModalRfp} />
                     ))}
                   </ScrollEntrance>
                 </div>
@@ -194,7 +205,7 @@ export default function RfpPage({
                 <ScrollEntrance>
                   <ol>
                     {rfps.map((rfp, i) => (
-                      <RfpRow key={rfp.number} index={i} rfp={rfp} />
+                      <RfpRow key={rfp.number} index={i} rfp={rfp} onOpen={setModalRfp} />
                     ))}
                   </ol>
                 </ScrollEntrance>
@@ -205,6 +216,16 @@ export default function RfpPage({
                 </div>
               )}
             </section>
+
+            {/* ── Markdown Modal ── */}
+            <MarkdownModal
+              open={!!modalRfp}
+              onClose={() => setModalRfp(null)}
+              markdown={modalRfp?.rawMarkdown || ""}
+              title={modalRfp ? `${modalRfp.number}: ${modalRfp.title}` : ""}
+              githubUrl={modalRfp?.githubUrl}
+              applyUrl="https://github.com/logos-co/rfp/issues/new?template=proposal.yml"
+            />
     </SiteLayout>
   );
 }

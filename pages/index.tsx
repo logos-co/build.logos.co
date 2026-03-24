@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "@components/Link";
@@ -9,9 +9,166 @@ import SiteLayout from "@components/SiteLayout";
 import cx from "classnames";
 import type { GetStaticProps } from "next";
 
+/* ── Countdown to next Friday 13:00 UTC ── */
+function isLiveNow(): boolean {
+  const now = new Date();
+  return now.getUTCDay() === 5 && now.getUTCHours() >= 13 && now.getUTCHours() < 14;
+}
+
+function getNextFriday13UTC(): Date {
+  const now = new Date();
+  const utcDay = now.getUTCDay(); // 0=Sun … 5=Fri
+  const utcHour = now.getUTCHours();
+  let daysUntilFri = (5 - utcDay + 7) % 7;
+  // If it's Friday and the session is over (>= 14:00 UTC), jump to next week
+  if (daysUntilFri === 0 && utcHour >= 14) {
+    daysUntilFri = 7;
+  }
+  const next = new Date(now);
+  next.setUTCDate(now.getUTCDate() + daysUntilFri);
+  next.setUTCHours(13, 0, 0, 0);
+  return next;
+}
+
+function useCountdown() {
+  const [state, setState] = useState<{ d: number; h: number; m: number; s: number; live: boolean } | null>(null);
+
+  useEffect(() => {
+    function calc() {
+      if (isLiveNow()) return { d: 0, h: 0, m: 0, s: 0, live: true };
+      const ms = getNextFriday13UTC().getTime() - Date.now();
+      if (ms <= 0) return { d: 0, h: 0, m: 0, s: 0, live: false };
+      const s = Math.floor(ms / 1000) % 60;
+      const m = Math.floor(ms / 60000) % 60;
+      const h = Math.floor(ms / 3600000) % 24;
+      const d = Math.floor(ms / 86400000);
+      return { d, h, m, s, live: false };
+    }
+    setState(calc());
+    const id = setInterval(() => setState(calc()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  return state;
+}
+
+/* ── Office Hours Card ── */
+const OFFICE_HOURS_URL = "https://meet.jit.si/FolkMemorialsRiskNext";
+
+function OfficeHoursCard() {
+  const cd = useCountdown();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const live = cd?.live ?? false;
+
+  return (
+    <div className="col-span-6 md:col-span-4 rounded-[16px] p-gutter flex flex-col gap-4 overflow-hidden relative min-h-[200px] border">
+      <div>
+        <span className="h5 sans block">Developer office hours</span>
+        <span className="body-tiny opacity-50 mt-1 block">Every Friday · 13:00 UTC</span>
+      </div>
+
+      {/* Live indicator or Countdown */}
+      {cd && (
+        live ? (
+          <div className="flex items-center gap-2 mt-auto">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+            </span>
+            <span className="h4 sans">Live Now</span>
+          </div>
+        ) : (
+          <div className="flex gap-3 mt-auto">
+            {[
+              { val: cd.d, label: "days" },
+              { val: cd.h, label: "hrs" },
+              { val: cd.m, label: "min" },
+              { val: cd.s, label: "sec" },
+            ].map(({ val, label }) => (
+              <div key={label} className="flex flex-col items-center">
+                <span className="h4 sans tabular-nums" style={{ fontVariantNumeric: "tabular-nums" }}>
+                  {pad(val)}
+                </span>
+                <span className="body-tiny opacity-40">{label}</span>
+              </div>
+            ))}
+          </div>
+        )
+      )}
+
+      <Link
+        to={OFFICE_HOURS_URL}
+        target="_blank"
+        className="mt-auto"
+      >
+        <span style={{ filter: live ? "none" : "blur(3px)", transition: "filter 0.3s" }}>
+          <Button as="span" arrow>
+            Join Call
+          </Button>
+        </span>
+      </Link>
+    </div>
+  );
+}
+
+/* ── Sample Apps Modal ── */
+const SAMPLE_APPS = [
+  { name: "Scaffold", desc: "Boilerplate to start building on LEZ.", url: "https://github.com/logos-co/logos-scaffold" },
+  { name: "Atomic Swaps", desc: "Trustless cross-chain atomic swap implementation.", url: "https://github.com/logos-co/eth-lez-atomic-swaps" },
+  { name: "Multisig", desc: "Multi-signature module for the Logos execution zone.", url: "https://github.com/jimmy-claw/logos-lez-multisig-module" },
+];
+
+function SampleAppsModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  useEffect(() => {
+    if (open) {
+      const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+      document.addEventListener("keydown", onKey);
+      document.body.style.overflow = "hidden";
+      return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+    }
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-margin" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/40" />
+      <div
+        className="relative bg-[var(--color-bg)] rounded-[16px] w-full max-w-[480px] p-8"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <span className="h5 sans">Sample Apps</span>
+          <button onClick={onClose} className="cursor-pointer p-1 rounded-full hover:bg-black/5 transition-colors" aria-label="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div className="space-y-3">
+          {SAMPLE_APPS.map((app) => (
+            <Link
+              key={app.name}
+              to={app.url}
+              target="_blank"
+              className="group flex items-center justify-between p-4 rounded-[10px] border transition-colors hover:bg-main!"
+            >
+              <div>
+                <span className="h6 sans block">{app.name}</span>
+                <p className="body-tiny opacity-50 mt-1">{app.desc}</p>
+              </div>
+              <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-4">&rarr;</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /*  Page  */
 
 export default function Home() {
+  const [sampleAppsOpen, setSampleAppsOpen] = useState(false);
+
   return (
     <SiteLayout>
       <Head>
@@ -318,7 +475,7 @@ export default function Home() {
 
                   {/* Scaffold */}
                   <Link
-                    to="https://github.com/logos-co/logos-app"
+                    to="https://github.com/logos-co/logos-scaffold"
                     target="_blank"
                     className="group col-span-3 md:col-span-4 rounded-[16px] p-gutter flex flex-col justify-between gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[140px]"
                     style={{ background: "var(--color-grey)" }}
@@ -328,34 +485,28 @@ export default function Home() {
                       <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                     </div>
                     <p className="body-tiny opacity-50">
-                      Start with a production-ready template.
+                      Start with a boilerplate.
                     </p>
                   </Link>
 
                   {/* Sample apps */}
-                  <Link
-                    to="https://github.com/logos-co/eth-lez-atomic-swaps/"
-                    target="_blank"
-                    className="group col-span-3 md:col-span-4 rounded-[16px] p-gutter flex flex-col justify-between gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[140px]"
+                  <button
+                    onClick={() => setSampleAppsOpen(true)}
+                    className="group col-span-3 md:col-span-4 rounded-[16px] p-gutter flex flex-col justify-between gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[140px] text-left cursor-pointer"
                     style={{ background: "var(--color-tan)" }}
                   >
-                    <div className="flex items-baseline justify-between">
+                    <div className="flex items-baseline justify-between w-full">
                       <span className="h6 sans transition-transform group-hover:-translate-y-0.5">Sample apps</span>
                       <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                     </div>
                     {/* App tiles */}
                     <div className="flex gap-1.5">
-                      {[
-                        { name: "Atomic Swaps", icon: "" },
-                        { name: "Multisig", icon: "" },
-                        { name: "Explorer", icon: "" },
-                      ].map((app, i) => (
+                      {SAMPLE_APPS.map((app, i) => (
                         <div
                           key={app.name}
                           className="flex-1 rounded-[6px] bg-bg/40 p-2 flex flex-col items-center gap-1.5 transition-all group-hover:bg-bg/70 group-hover:-translate-y-0.5"
                           style={{ transitionDelay: `${i * 60}ms` }}
                         >
-                          <span className="text-base opacity-40 transition-opacity group-hover:opacity-70" style={{ transitionDelay: `${i * 60}ms` }}>{app.icon}</span>
                           <span className="text-[9px] opacity-40 text-center leading-tight">{app.name}</span>
                         </div>
                       ))}
@@ -363,7 +514,7 @@ export default function Home() {
                     <p className="body-tiny opacity-50">
                       Real-world examples to learn from.
                     </p>
-                  </Link>
+                  </button>
 
                   {/* Workshops & Tutorials */}
                   <Link
@@ -468,41 +619,7 @@ export default function Home() {
                   </div>
 
                   {/* Developer Office Hours */}
-                  {/* Developer Office Hours */}
-                  <Link
-                    to="https://discord.gg/logosnetwork"
-                    target="_blank"
-                    className="group col-span-6 md:col-span-4 rounded-[16px] p-gutter flex flex-row gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[200px] border"
-                  >
-                    <div className="flex flex-col justify-between gap-4 flex-1 min-w-0">
-                      <div>
-                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5 block">Developer office hours</span>
-                      </div>
-                      <p className="body-tiny opacity-60">
-                        Join weekly live sessions with the engineering team. Ask questions, get unblocked, and share what you're building.
-                      </p>
-                      <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
-                    </div>
-                    {/* Animated calendar */}
-                    <div className="flex items-center justify-center shrink-0">
-                      <div className="w-[72px] rounded-[6px] border border-current/10 overflow-hidden bg-current/[0.02] group-hover:bg-current/[0.04] transition-colors">
-                        <div className="h-2 bg-teal/20 group-hover:bg-teal/40 transition-colors" />
-                        <div className="grid grid-cols-7 gap-px p-1.5">
-                          {[...Array(21)].map((_, i) => (
-                            <div
-                              key={i}
-                              className={`w-1.5 h-1.5 rounded-full transition-all ${
-                                i === 10
-                                  ? "bg-teal/50 group-hover:bg-teal group-hover:scale-150"
-                                  : "bg-current/[0.06] group-hover:bg-current/[0.12]"
-                              }`}
-                              style={{ transitionDelay: `${i * 15}ms` }}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
+                  <OfficeHoursCard />
 
                   {/* Speak to a Core Contributor */}
                   <Link
@@ -764,6 +881,7 @@ export default function Home() {
               </div>
             </section>
 
+    <SampleAppsModal open={sampleAppsOpen} onClose={() => setSampleAppsOpen(false)} />
     </SiteLayout>
   );
 }
