@@ -1,22 +1,27 @@
 import React, { useState } from "react";
 import Head from "next/head";
-import Link from "@components/Link";
 import TextLink from "@components/TextLink";
 import Button from "@components/Button";
 import ScrollEntrance from "@components/ScrollEntrance";
 import SiteLayout from "@components/SiteLayout";
+import MarkdownModal from "@components/MarkdownModal";
 import cx from "classnames";
 import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import { fetchPrizes, type PrizeData } from "@/lib/prizes";
 
 /* ───────────── Prize Grid Card ──────────────────────────────── */
 
-const PrizeCard = ({ prize }: { prize: PrizeData }) => (
+const PrizeCard = ({
+  prize,
+  onOpen,
+}: {
+  prize: PrizeData;
+  onOpen: (prize: PrizeData) => void;
+}) => (
   <div>
-    <Link
-      to={prize.githubUrl}
-      target="_blank"
-      className="p-gutter border rounded-[12px] h-full flex flex-col gap-gutter aspect-square transition-[background] hover:bg-main!"
+    <button
+      onClick={() => onOpen(prize)}
+      className="p-gutter border rounded-[12px] h-full flex flex-col gap-gutter aspect-square transition-[background] hover:bg-main! text-left w-full cursor-pointer"
     >
       <div className="w-full grow space-y-4">
         <div className="flex items-baseline justify-between gap-2">
@@ -56,7 +61,7 @@ const PrizeCard = ({ prize }: { prize: PrizeData }) => (
           <p className="body-tiny max-w-[26em]">{prize.overview}</p>
         </div>
       )}
-    </Link>
+    </button>
   </div>
 );
 
@@ -65,9 +70,11 @@ const PrizeCard = ({ prize }: { prize: PrizeData }) => (
 const PrizeRow = ({
   index,
   prize,
+  onOpen,
 }: {
   index: number;
   prize: PrizeData;
+  onOpen: (prize: PrizeData) => void;
 }) => (
   <li className={cx("theme-light-grey", { "bg-[#1525210D]!": index % 2 !== 0 })}>
     <div className="px-margin py-gutter flex gap-y-gutter flex-wrap lg:grid lg:grid-cols-12 lg:gap-x-gutter lg:min-h-[70px]">
@@ -95,7 +102,7 @@ const PrizeRow = ({
         </div>
       </div>
       <div className="order-4 lg:order-4 lg:col-span-2">
-        <TextLink to={prize.githubUrl} target="_blank" arrow>
+        <TextLink onClick={() => onOpen(prize)} arrow>
           View Prize
         </TextLink>
       </div>
@@ -109,6 +116,7 @@ export default function PrizePage({
   prizes,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [view, setView] = useState<"grid" | "list">("grid");
+  const [modalPrize, setModalPrize] = useState<PrizeData | null>(null);
 
   return (
     <SiteLayout>
@@ -193,7 +201,7 @@ export default function PrizePage({
                 <div className="mx-auto px-margin max-w-site-max-w-margin">
                   <ScrollEntrance className="grid gap-x-gutter gap-y-v-space-sm grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
                     {prizes.map((prize) => (
-                      <PrizeCard key={prize.number} prize={prize} />
+                      <PrizeCard key={prize.number} prize={prize} onOpen={setModalPrize} />
                     ))}
                   </ScrollEntrance>
                 </div>
@@ -201,7 +209,7 @@ export default function PrizePage({
                 <ScrollEntrance>
                   <ol>
                     {prizes.map((prize, i) => (
-                      <PrizeRow key={prize.number} index={i} prize={prize} />
+                      <PrizeRow key={prize.number} index={i} prize={prize} onOpen={setModalPrize} />
                     ))}
                   </ol>
                 </ScrollEntrance>
@@ -212,6 +220,15 @@ export default function PrizePage({
                 </div>
               )}
             </section>
+
+            {/* ── Markdown Modal ── */}
+            <MarkdownModal
+              open={!!modalPrize}
+              onClose={() => setModalPrize(null)}
+              markdown={modalPrize?.rawMarkdown || ""}
+              title={modalPrize ? `${modalPrize.number}: ${modalPrize.title}` : ""}
+              githubUrl={modalPrize?.githubUrl}
+            />
     </SiteLayout>
   );
 }
