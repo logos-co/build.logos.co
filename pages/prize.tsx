@@ -122,16 +122,16 @@ export default function PrizePage({
     <SiteLayout>
       <Head>
         <title>Prizes | Logos Builders Hub</title>
-        <meta name="description" content="Compete for prizes by building on the Logos execution layer. Browse the Lambda Prize program and ship code to win funding." />
+        <meta name="description" content="Compete for prizes by building on the Logos execution layer. Browse the Lambda Prize program and ship code to win support." />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Prizes | Logos Builders Hub" />
-        <meta property="og:description" content="Compete for prizes by building on the Logos execution layer. Browse the Lambda Prize program and ship code to win funding." />
+        <meta property="og:description" content="Compete for prizes by building on the Logos execution layer. Browse the Lambda Prize program and ship code to win support." />
         <meta property="og:url" content="https://build.logos.co/prize" />
         <meta property="og:image" content="https://build.logos.co/og.jpg" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@Logos_network" />
         <meta name="twitter:title" content="Prizes | Logos Builders Hub" />
-        <meta name="twitter:description" content="Compete for prizes by building on the Logos execution layer. Ship code, win funding." />
+        <meta name="twitter:description" content="Compete for prizes by building on the Logos execution layer. Ship code, win support." />
         <link rel="canonical" href="https://build.logos.co/prize" />
       </Head>
             {/* ── Back Link ── */}
