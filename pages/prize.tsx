@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import TextLink from "@components/TextLink";
 import Button from "@components/Button";
@@ -6,7 +6,6 @@ import ScrollEntrance from "@components/ScrollEntrance";
 import SiteLayout from "@components/SiteLayout";
 import MarkdownModal from "@components/MarkdownModal";
 import cx from "classnames";
-import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import { fetchPrizes, type PrizeData } from "@/lib/prizes";
 
 /* ───────────── Prize Grid Card ──────────────────────────────── */
@@ -26,18 +25,16 @@ const PrizeCard = ({
       <div className="w-full grow space-y-4">
         <div className="flex items-baseline justify-between gap-2">
           <span className="body-tiny opacity-60">{prize.number}</span>
-          {prize.status && (
+          {prize.status && !prize.status.toLowerCase().includes("open") && (
             <span
               className={cx("body-tiny px-2 py-[2px] rounded-full", {
-                "bg-green-100 text-green-800":
-                  prize.status.toLowerCase().includes("open"),
                 "bg-yellow-100 text-yellow-800":
                   prize.status.toLowerCase().includes("draft"),
                 "bg-blue-100 text-blue-800":
                   prize.status.toLowerCase().includes("completed"),
               })}
             >
-              {prize.status.split(" - ")[0].replace(/^draft$/i, "Draft").replace(/^open$/i, "Open")}
+              {prize.status.split(" - ")[0].replace(/^draft$/i, "Draft")}
             </span>
           )}
         </div>
@@ -112,11 +109,18 @@ const PrizeRow = ({
 
 /* ──────────────────────── Page ──────────────────────────────── */
 
-export default function PrizePage({
-  prizes,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+export default function PrizePage() {
+  const [prizes, setPrizes] = useState<PrizeData[]>([]);
+  const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [modalPrize, setModalPrize] = useState<PrizeData | null>(null);
+
+  useEffect(() => {
+    fetchPrizes()
+      .then(setPrizes)
+      .catch((err) => console.error("Failed to fetch prizes:", err))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <SiteLayout>
@@ -214,7 +218,12 @@ export default function PrizePage({
                   </ol>
                 </ScrollEntrance>
               )}
-              {prizes.length === 0 && (
+              {loading && (
+                <div className="px-margin py-v-space text-center">
+                  <p className="body-tiny opacity-60">Loading prizes...</p>
+                </div>
+              )}
+              {!loading && prizes.length === 0 && (
                 <div className="px-margin py-v-space text-center">
                   <p className="body-tiny opacity-60">No prizes found.</p>
                 </div>
@@ -233,14 +242,3 @@ export default function PrizePage({
   );
 }
 
-/* ─────────────── Fetch prizes from GitHub at build time ──────── */
-
-export const getStaticProps: GetStaticProps<{ prizes: PrizeData[] }> = async () => {
-  try {
-    const prizes = await fetchPrizes();
-    return { props: { prizes } };
-  } catch (err) {
-    console.error("Failed to fetch prizes:", err);
-    return { props: { prizes: [] } };
-  }
-};

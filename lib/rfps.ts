@@ -66,16 +66,15 @@ export async function parseRfpMarkdown(
 }
 
 export async function fetchRfps(): Promise<RfpData[]> {
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github.v3+json",
+  };
+  if (typeof process !== "undefined" && process.env?.GITHUB_TOKEN) {
+    headers.Authorization = `token ${process.env.GITHUB_TOKEN}`;
+  }
   const listRes = await fetch(
     "https://api.github.com/repos/logos-co/rfp/contents/RFPs",
-    {
-      headers: {
-        Accept: "application/vnd.github.v3+json",
-        ...(process.env.GITHUB_TOKEN
-          ? { Authorization: `token ${process.env.GITHUB_TOKEN}` }
-          : {}),
-      },
-    }
+    { headers }
   );
   const files = await listRes.json();
 
