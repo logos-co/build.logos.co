@@ -863,7 +863,7 @@ export default function Home() {
                       <div className="md:col-start-2 md:col-span-5 flex flex-col justify-center gap-4 text-center md:text-left items-center md:items-start">
                         <h2 className="h3 text-balance">Install Logos Basecamp.</h2>
                         <p className="body max-w-[28em]">
-                          Logos Basecamp is a complete distribution that bundles the kernel, the default modules, and UI packages into a usable product. It allows the user to easily interact with simple apps built on the various modules.
+                          Logos Basecamp is a complete distribution that bundles the kernel, the default modules, and UI packages into a usable interface. It allows the user to easily interact with simple apps built on the various modules.
                         </p>
                         <div className="mt-4">
                           <Button

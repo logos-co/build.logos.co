@@ -63,16 +63,15 @@ export async function parsePrizeMarkdown(
 }
 
 export async function fetchPrizes(): Promise<PrizeData[]> {
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github.v3+json",
+  };
+  if (typeof process !== "undefined" && process.env?.GITHUB_TOKEN) {
+    headers.Authorization = `token ${process.env.GITHUB_TOKEN}`;
+  }
   const listRes = await fetch(
     "https://api.github.com/repos/logos-co/lambda-prize/contents/prizes",
-    {
-      headers: {
-        Accept: "application/vnd.github.v3+json",
-        ...(process.env.GITHUB_TOKEN
-          ? { Authorization: `token ${process.env.GITHUB_TOKEN}` }
-          : {}),
-      },
-    }
+    { headers }
   );
   const files = await listRes.json();
 
@@ -94,7 +93,7 @@ export async function fetchPrizes(): Promise<PrizeData[]> {
     const rawRes = await fetch(file.download_url);
     const raw = await rawRes.text();
     const parsed = await parsePrizeMarkdown(raw, file.name, file.html_url);
-    if (parsed) prizes.push(parsed);
+    if (parsed && !parsed.status.toLowerCase().includes("draft")) prizes.push(parsed);
   }
 
   prizes.sort((a, b) => a.number.localeCompare(b.number));

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import TextLink from "@components/TextLink";
 import Button from "@components/Button";
@@ -6,7 +6,6 @@ import ScrollEntrance from "@components/ScrollEntrance";
 import SiteLayout from "@components/SiteLayout";
 import MarkdownModal from "@components/MarkdownModal";
 import cx from "classnames";
-import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import { fetchRfps, type RfpData } from "@/lib/rfps";
 
 /* ───────────── RFP Grid Card ────────────────────────────────── */
@@ -104,11 +103,18 @@ const RfpRow = ({
 
 /* ──────────────────────── Page ──────────────────────────────── */
 
-export default function RfpPage({
-  rfps,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+export default function RfpPage() {
+  const [rfps, setRfps] = useState<RfpData[]>([]);
+  const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [modalRfp, setModalRfp] = useState<RfpData | null>(null);
+
+  useEffect(() => {
+    fetchRfps()
+      .then(setRfps)
+      .catch((err) => console.error("Failed to fetch RFPs:", err))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <SiteLayout>
@@ -210,7 +216,12 @@ export default function RfpPage({
                   </ol>
                 </ScrollEntrance>
               )}
-              {rfps.length === 0 && (
+              {loading && (
+                <div className="px-margin py-v-space text-center">
+                  <p className="body-tiny opacity-60">Loading RFPs...</p>
+                </div>
+              )}
+              {!loading && rfps.length === 0 && (
                 <div className="px-margin py-v-space text-center">
                   <p className="body-tiny opacity-60">No RFPs found.</p>
                 </div>
@@ -230,14 +241,3 @@ export default function RfpPage({
   );
 }
 
-/* ─────────────── Fetch RFPs from GitHub at build time ────────── */
-
-export const getStaticProps: GetStaticProps<{ rfps: RfpData[] }> = async () => {
-  try {
-    const rfps = await fetchRfps();
-    return { props: { rfps } };
-  } catch (err) {
-    console.error("Failed to fetch RFPs:", err);
-    return { props: { rfps: [] } };
-  }
-};
