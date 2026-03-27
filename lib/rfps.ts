@@ -96,7 +96,7 @@ export async function fetchRfps(): Promise<RfpData[]> {
     const rawRes = await fetch(file.download_url);
     const raw = await rawRes.text();
     const parsed = await parseRfpMarkdown(raw, file.name, file.html_url);
-    if (parsed) rfps.push(parsed);
+    if (parsed && !parsed.status.toLowerCase().includes("draft")) rfps.push(parsed);
   }
 
   rfps.sort((a, b) => a.number.localeCompare(b.number));

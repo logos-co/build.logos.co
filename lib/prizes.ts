@@ -93,7 +93,7 @@ export async function fetchPrizes(): Promise<PrizeData[]> {
     const rawRes = await fetch(file.download_url);
     const raw = await rawRes.text();
     const parsed = await parsePrizeMarkdown(raw, file.name, file.html_url);
-    if (parsed && !parsed.status.toLowerCase().includes("draft")) prizes.push(parsed);
+    if (parsed && !parsed.status.toLowerCase().includes("draft") && !parsed.status.toLowerCase().includes("closed")) prizes.push(parsed);
   }
 
   prizes.sort((a, b) => a.number.localeCompare(b.number));
