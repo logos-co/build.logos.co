@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import TextLink from "@components/TextLink";
 import Button from "@components/Button";
 import ScrollEntrance from "@components/ScrollEntrance";
@@ -7,6 +8,7 @@ import SiteLayout from "@components/SiteLayout";
 import MarkdownModal from "@components/MarkdownModal";
 import cx from "classnames";
 import { fetchPrizes, type PrizeData } from "@/lib/prizes";
+import { trackEvent } from "@/context/UmamiProvider";
 
 /* ───────────── Prize Grid Card ──────────────────────────────── */
 
@@ -110,6 +112,7 @@ const PrizeRow = ({
 /* ──────────────────────── Page ──────────────────────────────── */
 
 export default function PrizePage() {
+  const { asPath } = useRouter();
   const [prizes, setPrizes] = useState<PrizeData[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"grid" | "list">("grid");
@@ -168,6 +171,9 @@ export default function PrizePage() {
                       to="https://github.com/logos-co/lambda-prize"
                       target="_blank"
                       arrow
+                      onClick={() =>
+                        trackEvent("prize_view_repo", { source: asPath })
+                      }
                     >
                       View the Repo
                     </Button>

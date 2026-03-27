@@ -1,9 +1,18 @@
 import React from 'react'
+import { useRouter } from 'next/router'
 import TextLink from '@components/TextLink'
 import Button from '@components/Button'
-import { getLinkProps } from '@utils/helpers'
+import { getLinkProps, slugify } from '@utils/helpers'
+import { trackEvent } from '@context/UmamiProvider'
 import cx from 'classnames'
 import { DynamicIcon } from 'lucide-react/dynamic'
+
+const getUmamiEventName = (action) => {
+	const explicit =
+		typeof action.umamiEventName === 'string' && action.umamiEventName.trim()
+	const fromTitle = slugify(action.title || 'cta').replace(/-/g, '_')
+	return explicit || fromTitle || 'click'
+}
 
 const Actions = ({
 	actions,
@@ -13,15 +22,23 @@ const Actions = ({
 	alwaysButton = false,
 	themes = []
 }) => {
+	const { asPath } = useRouter()
+
 	if (!actions || actions.length < 1) {
 		return false
 	}
 
-
-
 	let alignmentClass = 'justify-start'
 	if (alignment === 'center') {
 		alignmentClass = 'justify-center'
+	}
+
+	const handleTrackedClick = (action) => () => {
+		if (!action.trackUmami) return
+		const source = action.umamiUseCurrentPath
+			? asPath
+			: action.umamiEventSource || ''
+		trackEvent(getUmamiEventName(action), { source })
 	}
 
 	return (
@@ -49,6 +66,9 @@ const Actions = ({
 								themes[index] || action.theme
 							)}
 							{...getLinkProps(action)}
+							onClick={
+								action.trackUmami ? handleTrackedClick(action) : undefined
+							}
 						>
 							{action.title}
 						</Button>
@@ -60,6 +80,9 @@ const Actions = ({
 							{...getLinkProps(action)}
 							className='!m-0'
 							arrow={arrows}
+							onClick={
+								action.trackUmami ? handleTrackedClick(action) : undefined
+							}
 						>
 							{action.title}
 						</TextLink>
