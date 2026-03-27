@@ -25,16 +25,18 @@ const PrizeCard = ({
       <div className="w-full grow space-y-4">
         <div className="flex items-baseline justify-between gap-2">
           <span className="body-tiny opacity-60">{prize.number}</span>
-          {prize.status && !prize.status.toLowerCase().includes("open") && (
+          {prize.status && (
             <span
               className={cx("body-tiny px-2 py-[2px] rounded-full", {
+                "bg-green-100 text-green-800":
+                  prize.status.toLowerCase().includes("open"),
                 "bg-yellow-100 text-yellow-800":
                   prize.status.toLowerCase().includes("draft"),
                 "bg-blue-100 text-blue-800":
                   prize.status.toLowerCase().includes("completed"),
               })}
             >
-              {prize.status.split(" - ")[0].replace(/^draft$/i, "Draft")}
+              {prize.status.split(" - ")[0].replace(/^draft$/i, "Draft").replace(/^open$/i, "Open")}
             </span>
           )}
         </div>
