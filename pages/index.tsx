@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import Link from "@components/Link";
 import TextLink from "@components/TextLink";
 import Button from "@components/Button";
@@ -8,6 +9,7 @@ import ScrollEntrance from "@components/ScrollEntrance";
 import SiteLayout from "@components/SiteLayout";
 import cx from "classnames";
 import type { GetStaticProps } from "next";
+import { trackEvent } from "@/context/UmamiProvider";
 
 /* ── Countdown to next Friday 13:00 UTC ── */
 function isLiveNow(): boolean {
@@ -56,6 +58,7 @@ function useCountdown() {
 const OFFICE_HOURS_URL = "https://meet.jit.si/FolkMemorialsRiskNext";
 
 function OfficeHoursCard() {
+  const { asPath } = useRouter();
   const cd = useCountdown();
   const pad = (n: number) => String(n).padStart(2, "0");
   const live = cd?.live ?? false;
@@ -98,7 +101,11 @@ function OfficeHoursCard() {
 
       <div className="flex gap-2 mt-auto">
         {live && (
-          <Link to={OFFICE_HOURS_URL} target="_blank">
+          <Link
+            to={OFFICE_HOURS_URL}
+            target="_blank"
+            onClick={() => trackEvent("office_hours_join_call", { source: asPath })}
+          >
             <Button as="span" arrow>
               Join Call
             </Button>
@@ -106,6 +113,7 @@ function OfficeHoursCard() {
         )}
         <button
           onClick={() => {
+            trackEvent("office_hours_add_calendar", { source: asPath });
             const ics = [
               "BEGIN:VCALENDAR",
               "VERSION:2.0",
@@ -249,8 +257,13 @@ function DevSupportModal({ open, onClose }: { open: boolean; onClose: () => void
 /*  Page  */
 
 export default function Home() {
+  const { asPath } = useRouter();
   const [sampleAppsOpen, setSampleAppsOpen] = useState(false);
   const [devSupportOpen, setDevSupportOpen] = useState(false);
+
+  const trackClick = (eventName: string) => () => {
+    trackEvent(eventName, { source: asPath });
+  };
 
   return (
     <SiteLayout>
@@ -342,6 +355,7 @@ export default function Home() {
                     to="https://discord.gg/logosnetwork"
                     target="_blank"
                     className="group flex items-center gap-2 px-4 py-2 rounded-full border transition-colors hover:bg-dark-green hover:text-bg shrink-0"
+                    onClick={trackClick("discord_need_help")}
                   >
                     <svg width="16" height="12" viewBox="0 0 71 55" fill="currentColor">
                       <path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.2a.2.2 0 0 0-.2.1 40.8 40.8 0 0 0-1.8 3.7 54 54 0 0 0-16.2 0A37.4 37.4 0 0 0 25.4.3a.2.2 0 0 0-.2-.1A58.4 58.4 0 0 0 10.6 4.9a.2.2 0 0 0-.1.1C1.5 18.7-.9 32.2.3 45.5v.2a58.9 58.9 0 0 0 17.7 9a.2.2 0 0 0 .3-.1 42.1 42.1 0 0 0 3.6-5.9.2.2 0 0 0-.1-.3 38.8 38.8 0 0 1-5.5-2.7.2.2 0 0 1 0-.4l1.1-.9a.2.2 0 0 1 .2 0 42 42 0 0 0 35.8 0 .2.2 0 0 1 .2 0l1.1.9a.2.2 0 0 1 0 .4 36.4 36.4 0 0 1-5.5 2.7.2.2 0 0 0-.1.3 47.2 47.2 0 0 0 3.6 5.9.2.2 0 0 0 .3.1A58.7 58.7 0 0 0 70.5 45.7v-.2c1.4-15-2.3-28.1-9.8-39.7a.2.2 0 0 0-.1 0ZM23.7 37.3c-3.4 0-6.3-3.2-6.3-7s2.8-7 6.3-7 6.3 3.1 6.3 7-2.8 7-6.3 7Zm23.3 0c-3.4 0-6.3-3.2-6.3-7s2.8-7 6.3-7 6.3 3.1 6.3 7-2.8 7-6.3 7Z" />
@@ -367,6 +381,7 @@ export default function Home() {
                     target="_blank"
                     className="group col-span-6 md:col-span-7 rounded-[16px] p-gutter flex flex-col justify-between gap-6 overflow-hidden relative transition-all hover:shadow-sm min-h-[280px]"
                     style={{ background: "var(--color-tan)" }}
+                    onClick={trackClick("explore_community_ideas")}
                   >
                     <div className="flex items-baseline justify-between">
                       <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Explore community ideas</span>
@@ -417,6 +432,7 @@ export default function Home() {
                   <Link
                     to="/contribute"
                     className="group col-span-6 md:col-span-5 rounded-[16px] p-gutter flex flex-col justify-between gap-4 overflow-hidden relative border transition-all hover:shadow-sm min-h-[280px]"
+                    onClick={trackClick("start_contributing_github_issues")}
                   >
                     <div className="flex items-baseline justify-between">
                       <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Start contributing with GitHub issues</span>
@@ -471,6 +487,7 @@ export default function Home() {
                     target="_blank"
                     className="group col-span-6 md:col-span-5 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[280px] flex flex-col"
                     style={{ background: "var(--color-light-blue)" }}
+                    onClick={trackClick("install_logos_basecamp")}
                   >
                     {/* App screenshot */}
                     <div className="mx-gutter mt-gutter flex-1 overflow-hidden rounded-t-[12px] transition-transform group-hover:-translate-y-1">
@@ -493,6 +510,7 @@ export default function Home() {
                     target="_blank"
                     className="group col-span-6 md:col-span-7 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[280px] flex flex-col theme-dark"
                     style={{ background: "var(--color-dark-green)" }}
+                    onClick={trackClick("run_node_cli")}
                   >
                     {/* Terminal mock */}
                     <div className="mx-gutter mt-gutter rounded-t-[8px] bg-white/5 flex-1 flex flex-col overflow-hidden transition-transform group-hover:-translate-y-1">
@@ -540,6 +558,7 @@ export default function Home() {
                     to="https://github.com/logos-co/logos-docs"
                     target="_blank"
                     className="group col-span-6 md:col-span-4 md:row-span-2 rounded-[16px] p-gutter flex flex-col justify-between overflow-hidden relative transition-all hover:shadow-sm border min-h-[200px]"
+                    onClick={trackClick("read_the_docs")}
                   >
                     <div>
                       <div className="flex items-baseline justify-between mb-6">
@@ -565,6 +584,7 @@ export default function Home() {
                     target="_blank"
                     className="group col-span-3 md:col-span-4 rounded-[16px] p-gutter flex flex-col justify-between gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[140px]"
                     style={{ background: "var(--color-grey)" }}
+                    onClick={trackClick("scaffold_boilerplate")}
                   >
                     <div className="flex items-baseline justify-between">
                       <span className="h6 sans transition-transform group-hover:-translate-y-0.5">Scaffold boilerplate</span>
@@ -577,9 +597,12 @@ export default function Home() {
 
                   {/* Sample apps */}
                   <button
-                    onClick={() => setSampleAppsOpen(true)}
                     className="group col-span-3 md:col-span-4 rounded-[16px] p-gutter flex flex-col justify-between gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[140px] text-left cursor-pointer"
                     style={{ background: "var(--color-tan)" }}
+                    onClick={() => {
+                      setSampleAppsOpen(true);
+                      trackClick("sample_apps")();
+                    }}
                   >
                     <div className="flex items-baseline justify-between w-full">
                       <span className="h6 sans transition-transform group-hover:-translate-y-0.5">Sample apps</span>
@@ -607,6 +630,7 @@ export default function Home() {
                     to="https://www.youtube.com/@LogosNetwork"
                     target="_blank"
                     className="group col-span-3 md:col-span-4 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[140px] flex flex-col text-white"
+                    onClick={trackClick("workshops_tutorials")}
                   >
                     {/* GIF background */}
                     <img
@@ -629,9 +653,12 @@ export default function Home() {
 
                   {/* Developer support */}
                   <button
-                    onClick={() => setDevSupportOpen(true)}
                     className="cursor-pointer group col-span-3 md:col-span-4 rounded-[16px] p-gutter flex flex-col justify-between gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[140px] text-left"
                     style={{ background: "var(--color-light-blue)" }}
+                    onClick={() => {
+                      setDevSupportOpen(true);
+                      trackClick("developer_support")();
+                    }}
                   >
                     <div className="flex items-baseline justify-between w-full">
                       <span className="h6 sans transition-transform group-hover:-translate-y-0.5">Developer support</span>
@@ -655,6 +682,7 @@ export default function Home() {
                     to="/prize"
                     className="group col-span-6 rounded-[16px] p-gutter flex flex-col justify-between gap-12 overflow-hidden relative transition-all hover:shadow-sm min-h-[240px] theme-dark"
                     style={{ background: "var(--color-dark-green)" }}
+                    onClick={trackClick("prizes")}
                   >
                     <div className="flex items-baseline justify-between">
                       <span className="h4 sans transition-transform group-hover:-translate-y-0.5 flex items-center gap-2"><img src="/mark.svg" alt="" className="h-[0.7em] brightness-0 invert" />Prizes</span>
@@ -677,7 +705,8 @@ export default function Home() {
                     to="/rfp"
                     className="group col-span-6 rounded-[16px] p-gutter flex flex-col justify-between gap-12 overflow-hidden relative transition-all hover:shadow-sm min-h-[240px]"
                     style={{ background: "var(--color-tan)" }}
-                  >
+                    onClick={trackClick("explore_rfps")}
+                    >
                     <div className="flex items-baseline justify-between">
                       <span className="h4 sans transition-transform group-hover:-translate-y-0.5">Explore RFPs</span>
                       <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
@@ -701,6 +730,7 @@ export default function Home() {
                     to="https://cal.com/team/logos-onboarding/intro"
                     target="_blank"
                     className="group col-span-6 md:col-span-4 rounded-[16px] p-gutter flex flex-col gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[200px] border"
+                    onClick={trackClick("speak_to_core_contributor")}
                   >
                     <div className="flex items-baseline justify-between">
                       <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Speak to a core contributor</span>
@@ -716,6 +746,7 @@ export default function Home() {
                     to="https://forum.logos.co/"
                     target="_blank"
                     className="group col-span-6 md:col-span-4 rounded-[16px] p-gutter flex flex-col gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[200px] border"
+                    onClick={trackClick("logos_community_forum")}
                   >
                     <div className="flex items-baseline justify-between">
                       <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Logos community forum</span>
@@ -871,6 +902,7 @@ export default function Home() {
                             target="_blank"
                             className="secondary"
                             arrow
+                            onClick={trackClick("install_logos_basecamp_section")}
                           >
                             Install
                           </Button>

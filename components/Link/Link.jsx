@@ -3,7 +3,6 @@
 import React from 'react'
 import { useAppContext } from '@/context/AppContext'
 import NextLink from 'next/link'
-import { useRouter } from 'next/router'
 
 const Link = ({
 	to = undefined,
@@ -15,7 +14,7 @@ const Link = ({
 	name = undefined,
 	title = undefined,
 	popup = undefined,
-	onClick = false,
+	onClick = undefined,
 	transition = true,
 	style = {},
 	as = undefined,
@@ -32,35 +31,40 @@ const Link = ({
 		ariaLabel = (name || title || childString) + ' - Open in new tab'
 	}
 
-	const clickHandler = () => {
+	const clickHandler = (e) => {
 		if (onClick) {
-			onClick()
+			onClick(e)
 		}
 		if (popup?.slug) {
 			toggleModal(popup.slug)
 		}
 	}
 
-	let LinkEl = NextLink
 	href = href || to || ''
+	const hasHref = Boolean(href)
 
+	let LinkEl = NextLink
 	let linkProps = {
-		href: href || to || '',
-		scroll: !(href || '').startsWith('#'),
+		href: href || '',
+		scroll: !href.startsWith('#'),
 		target: target,
 		...(target === '_blank' && { rel: 'noopener noreferrer' }),
-	}
-	if (onClick || popup) {
-		LinkEl = 'button'
-		linkProps = {
-			onClick: clickHandler,
-			className: className + ' cursor-pointer'
-		}
 	}
 
 	if (as) {
 		LinkEl = as
 		linkProps = props
+	} else if (hasHref && (onClick || popup)) {
+		linkProps = {
+			...linkProps,
+			onClick: clickHandler,
+		}
+	} else if (!hasHref && (onClick || popup)) {
+		LinkEl = 'button'
+		linkProps = {
+			type: 'button',
+			onClick: clickHandler,
+		}
 	}
 
 	return (
