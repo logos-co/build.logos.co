@@ -145,13 +145,13 @@ export default function RfpPage() {
             <section className="pt-v-space-sm pb-half-v-space theme-default">
               <div className="mx-auto px-margin max-w-site-max-w-margin">
                 <ScrollEntrance className="grid gap-gutter grid-cols-12">
-                  <div className="col-span-5">
+                  <div className="col-span-12 md:col-span-5">
                     <h1 className="h2 text-balance flex items-center gap-3">
                       <img src="/mark.svg" alt="" className="h-[0.8em]" />
                       RFPs
                     </h1>
                   </div>
-                  <div className="col-span-4 flex flex-col justify-center gap-2">
+                  <div className="col-span-12 md:col-span-4 flex flex-col justify-center gap-2">
                     <p className="body-tiny max-w-[26em] text-balance">
                       The Logos RFP Program supports developers to build
                       applications on the Logos Stack. Browse all open requests
@@ -161,7 +161,7 @@ export default function RfpPage() {
                       Terms and Conditions
                     </TextLink>
                   </div>
-                  <div className="col-span-3 flex items-center justify-end">
+                  <div className="col-span-12 md:col-span-3 flex items-center md:justify-end">
                     <Button
                       to="https://github.com/logos-co/rfp"
                       target="_blank"

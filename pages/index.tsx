@@ -353,10 +353,80 @@ export default function Home() {
                 {/*  Full bento grid  */}
                 <ScrollEntrance className="grid grid-cols-6 md:grid-cols-12 gap-gutter">
 
-                  {/*  PHASE 01: GET INSPIRED  */}
-                  {/* Phase label  spans full width */}
+                  {/*  PHASE 01: PARTICIPATE  */}
                   <div className="col-span-6 md:col-span-12 flex items-end gap-4 pb-2">
                     <span className="font-mono text-[3rem] md:text-[4.5rem] leading-none font-light opacity-[0.07] select-none">01</span>
+                    <h3 className="h4 sans pb-1">Participate</h3>
+                    <div className="flex-1 h-px bg-current opacity-10 mb-3" />
+                  </div>
+
+                  {/* Install Basecamp  with app preview */}
+                  <Link
+                    to="https://github.com/logos-co/logos-app/releases"
+                    target="_blank"
+                    className="group col-span-6 md:col-span-5 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[280px] flex flex-col"
+                    style={{ background: "var(--color-light-blue)" }}
+                  >
+                    {/* App screenshot */}
+                    <div className="mx-gutter mt-gutter flex-1 overflow-hidden rounded-t-[12px] transition-transform group-hover:-translate-y-1">
+                      <img src="/basecamp.png" alt="Logos Basecamp" className="w-full h-full object-cover object-top" />
+                    </div>
+                    <div className="p-gutter">
+                      <div className="flex items-baseline justify-between">
+                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Install Logos Basecamp</span>
+                        <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
+                      </div>
+                      <p className="body-tiny opacity-60 mt-2">
+                        Leverage the interface to the parallel society and experiment with the applications available in the Alpha Release.
+                      </p>
+                    </div>
+                  </Link>
+
+                  {/* Run a Node  terminal style */}
+                  <Link
+                    to="https://github.com/logos-co/logos-docs/blob/main/docs/blockchain/quickstart-guide-for-the-logos-blockchain-node.md"
+                    target="_blank"
+                    className="group col-span-6 md:col-span-7 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[280px] flex flex-col theme-dark"
+                    style={{ background: "var(--color-dark-green)" }}
+                  >
+                    {/* Terminal mock */}
+                    <div className="mx-gutter mt-gutter rounded-t-[8px] bg-white/5 flex-1 flex flex-col overflow-hidden transition-transform group-hover:-translate-y-1">
+                      <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/5">
+                        <div className="w-2 h-2 rounded-full bg-white/10" />
+                        <div className="w-2 h-2 rounded-full bg-white/10" />
+                        <div className="w-2 h-2 rounded-full bg-white/10" />
+                        <span className="text-[10px] opacity-20 ml-2 font-mono">terminal</span>
+                      </div>
+                      <div className="p-4 font-mono text-xs space-y-1 flex-1">
+                        <p className="opacity-60"><span className="opacity-40">$</span> curl -s http://localhost:8080/network/info | jq</p>
+                        <p className="opacity-40">{"{"}</p>
+                        <p className="opacity-40">  &quot;listen_addresses&quot;: [</p>
+                        <p className="opacity-40">    &quot;/ip4/127.0.0.1/udp/3000/quic-v1&quot;,</p>
+                        <p className="opacity-40">    &quot;/ip4/172.18.0.2/udp/3000/quic-v1&quot;</p>
+                        <p className="opacity-40">  ],</p>
+                        <p className="opacity-40">  &quot;peer_id&quot;: <span className="text-teal opacity-70">&quot;12D3Koo...RWmwmt&quot;</span>,</p>
+                        <p className="opacity-40">  &quot;n_peers&quot;: <span className="text-teal opacity-70">4</span>,</p>
+                        <p className="opacity-40">  &quot;n_connections&quot;: <span className="text-teal opacity-70">7</span>,</p>
+                        <p className="opacity-40">  &quot;n_pending_connections&quot;: <span className="text-teal opacity-70">3</span></p>
+                        <p className="opacity-40">{"}"}</p>
+                        <p className="opacity-60 mt-2"><span className="opacity-40">$</span> <span className="inline-block w-[5px] h-[10px] bg-teal/70 opacity-0 group-hover:animate-blink" /></p>
+                      </div>
+                    </div>
+                    <div className="p-gutter">
+                      <div className="flex items-baseline justify-between">
+                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Run a Node using CLI</span>
+                        <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
+                      </div>
+                      <p className="body-tiny opacity-40 mt-2">
+                        Participate in the network by becoming a node operator. Connect to the testnet in minutes and engage with the protocol.
+                      </p>
+                    </div>
+                  </Link>
+
+                  {/*  PHASE 02: GET INSPIRED  */}
+                  {/* Phase label  spans full width */}
+                  <div className="col-span-6 md:col-span-12 flex items-end gap-4 mt-gutter pb-2">
+                    <span className="font-mono text-[3rem] md:text-[4.5rem] leading-none font-light opacity-[0.07] select-none">02</span>
                     <h3 className="h4 sans pb-1">Get Inspired</h3>
                     <div className="flex-1 h-px bg-current opacity-10 mb-3" />
                   </div>
@@ -456,76 +526,6 @@ export default function Home() {
                     <p className="body-tiny opacity-60 max-w-[28em]">
                       Pick up a good first issue and ship your first PR.
                     </p>
-                  </Link>
-
-                  {/*  PHASE 02: TRY  */}
-                  <div className="col-span-6 md:col-span-12 flex items-end gap-4 mt-gutter pb-2">
-                    <span className="font-mono text-[3rem] md:text-[4.5rem] leading-none font-light opacity-[0.07] select-none">02</span>
-                    <h3 className="h4 sans pb-1">Participate</h3>
-                    <div className="flex-1 h-px bg-current opacity-10 mb-3" />
-                  </div>
-
-                  {/* Install Basecamp  with app preview */}
-                  <Link
-                    to="https://github.com/logos-co/logos-app/releases"
-                    target="_blank"
-                    className="group col-span-6 md:col-span-5 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[280px] flex flex-col"
-                    style={{ background: "var(--color-light-blue)" }}
-                  >
-                    {/* App screenshot */}
-                    <div className="mx-gutter mt-gutter flex-1 overflow-hidden rounded-t-[12px] transition-transform group-hover:-translate-y-1">
-                      <img src="/basecamp.png" alt="Logos Basecamp" className="w-full h-full object-cover object-top" />
-                    </div>
-                    <div className="p-gutter">
-                      <div className="flex items-baseline justify-between">
-                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Install Logos Basecamp</span>
-                        <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
-                      </div>
-                      <p className="body-tiny opacity-60 mt-2">
-                        Leverage the interface to the parallel society and experiment with the applications available in the Alpha Release.
-                      </p>
-                    </div>
-                  </Link>
-
-                  {/* Run a Node  terminal style */}
-                  <Link
-                    to="https://github.com/logos-co/logos-docs/blob/main/docs/blockchain/quickstart-guide-for-the-logos-blockchain-node.md"
-                    target="_blank"
-                    className="group col-span-6 md:col-span-7 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[280px] flex flex-col theme-dark"
-                    style={{ background: "var(--color-dark-green)" }}
-                  >
-                    {/* Terminal mock */}
-                    <div className="mx-gutter mt-gutter rounded-t-[8px] bg-white/5 flex-1 flex flex-col overflow-hidden transition-transform group-hover:-translate-y-1">
-                      <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/5">
-                        <div className="w-2 h-2 rounded-full bg-white/10" />
-                        <div className="w-2 h-2 rounded-full bg-white/10" />
-                        <div className="w-2 h-2 rounded-full bg-white/10" />
-                        <span className="text-[10px] opacity-20 ml-2 font-mono">terminal</span>
-                      </div>
-                      <div className="p-4 font-mono text-xs space-y-1 flex-1">
-                        <p className="opacity-60"><span className="opacity-40">$</span> curl -s http://localhost:8080/network/info | jq</p>
-                        <p className="opacity-40">{"{"}</p>
-                        <p className="opacity-40">  &quot;listen_addresses&quot;: [</p>
-                        <p className="opacity-40">    &quot;/ip4/127.0.0.1/udp/3000/quic-v1&quot;,</p>
-                        <p className="opacity-40">    &quot;/ip4/172.18.0.2/udp/3000/quic-v1&quot;</p>
-                        <p className="opacity-40">  ],</p>
-                        <p className="opacity-40">  &quot;peer_id&quot;: <span className="text-teal opacity-70">&quot;12D3Koo...RWmwmt&quot;</span>,</p>
-                        <p className="opacity-40">  &quot;n_peers&quot;: <span className="text-teal opacity-70">4</span>,</p>
-                        <p className="opacity-40">  &quot;n_connections&quot;: <span className="text-teal opacity-70">7</span>,</p>
-                        <p className="opacity-40">  &quot;n_pending_connections&quot;: <span className="text-teal opacity-70">3</span></p>
-                        <p className="opacity-40">{"}"}</p>
-                        <p className="opacity-60 mt-2"><span className="opacity-40">$</span> <span className="inline-block w-[5px] h-[10px] bg-teal/70 opacity-0 group-hover:animate-blink" /></p>
-                      </div>
-                    </div>
-                    <div className="p-gutter">
-                      <div className="flex items-baseline justify-between">
-                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Run a Node using CLI</span>
-                        <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
-                      </div>
-                      <p className="body-tiny opacity-40 mt-2">
-                        Participate in the network by becoming a node operator. Connect to the testnet in minutes and engage with the protocol.
-                      </p>
-                    </div>
                   </Link>
 
                   {/*  PHASE 03: BUILD  */}

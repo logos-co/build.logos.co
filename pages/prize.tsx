@@ -153,19 +153,19 @@ export default function PrizePage() {
             <section className="pt-v-space-sm pb-half-v-space theme-default">
               <div className="mx-auto px-margin max-w-site-max-w-margin">
                 <ScrollEntrance className="grid gap-gutter grid-cols-12">
-                  <div className="col-span-5">
+                  <div className="col-span-12 md:col-span-5">
                     <h1 className="h2 text-balance flex items-center gap-3">
                       <img src="/mark.svg" alt="" className="h-[0.8em]" />
                       Prizes
                     </h1>
                   </div>
-                  <div className="col-span-4 flex items-center">
+                  <div className="col-span-12 md:col-span-4 flex items-center">
                     <p className="body-tiny max-w-[26em] text-balance">
                       The Logos Lambda Prize program offers competitive prizes
                       for building on the Logos stack. Browse all prizes below.
                     </p>
                   </div>
-                  <div className="col-span-3 flex items-center justify-end">
+                  <div className="col-span-12 md:col-span-3 flex items-center md:justify-end">
                     <Button
                       to="https://github.com/logos-co/lambda-prize"
                       target="_blank"
