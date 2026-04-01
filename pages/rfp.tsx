@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import TextLink from "@components/TextLink";
 import Button from "@components/Button";
 import ScrollEntrance from "@components/ScrollEntrance";
@@ -7,6 +8,7 @@ import SiteLayout from "@components/SiteLayout";
 import MarkdownModal from "@components/MarkdownModal";
 import cx from "classnames";
 import { fetchRfps, type RfpData } from "@/lib/rfps";
+import { trackEvent } from "@/context/UmamiProvider";
 
 /* ───────────── RFP Grid Card ────────────────────────────────── */
 
@@ -104,6 +106,7 @@ const RfpRow = ({
 /* ──────────────────────── Page ──────────────────────────────── */
 
 export default function RfpPage() {
+  const { asPath } = useRouter();
   const [rfps, setRfps] = useState<RfpData[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"grid" | "list">("grid");
@@ -166,6 +169,9 @@ export default function RfpPage() {
                       to="https://github.com/logos-co/rfp"
                       target="_blank"
                       arrow
+                      onClick={() =>
+                        trackEvent("rfp_view_repo", { source: asPath })
+                      }
                     >
                       View the Repo
                     </Button>
