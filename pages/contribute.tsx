@@ -238,12 +238,17 @@ export const getStaticProps: GetStaticProps<{
   stats: ContributionStatsType | null;
 }> = async () => {
   try {
-    const [issues, stats] = await Promise.all([
-      fetchGoodFirstIssues(),
-      fetchContributionStats(),
-    ]);
+    const issues = await fetchGoodFirstIssues();
     const repoSet = new Set(issues.map((i) => i.repo));
     const repos = Array.from(repoSet).sort();
+
+    let stats: ContributionStatsType | null = null;
+    try {
+      stats = await fetchContributionStats();
+    } catch (statsErr) {
+      console.error("Failed to fetch contribution stats:", statsErr);
+    }
+
     return { props: { issues, repos, stats } };
   } catch (err) {
     console.error("Failed to fetch issues:", err);
