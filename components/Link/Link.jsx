@@ -53,7 +53,10 @@ const Link = ({
 
 	if (as) {
 		LinkEl = as
-		linkProps = props
+		linkProps = {
+			...props,
+			...(onClick || popup ? { onClick: clickHandler } : {}),
+		}
 	} else if (hasHref && (onClick || popup)) {
 		linkProps = {
 			...linkProps,
