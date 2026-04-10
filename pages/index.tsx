@@ -11,24 +11,24 @@ import cx from "classnames";
 import type { GetStaticProps } from "next";
 import { trackEvent } from "@/context/UmamiProvider";
 
-/* ── Countdown to next Friday 13:00 UTC ── */
+/* ── Countdown to next Friday 12:00 UTC ── */
 function isLiveNow(): boolean {
   const now = new Date();
-  return now.getUTCDay() === 5 && now.getUTCHours() >= 13 && now.getUTCHours() < 14;
+  return now.getUTCDay() === 5 && now.getUTCHours() >= 12 && now.getUTCHours() < 13;
 }
 
-function getNextFriday13UTC(): Date {
+function getNextFriday12UTC(): Date {
   const now = new Date();
   const utcDay = now.getUTCDay(); // 0=Sun … 5=Fri
   const utcHour = now.getUTCHours();
   let daysUntilFri = (5 - utcDay + 7) % 7;
-  // If it's Friday and the session is over (>= 14:00 UTC), jump to next week
-  if (daysUntilFri === 0 && utcHour >= 14) {
+  // If it's Friday and the session is over (>= 13:00 UTC), jump to next week
+  if (daysUntilFri === 0 && utcHour >= 13) {
     daysUntilFri = 7;
   }
   const next = new Date(now);
   next.setUTCDate(now.getUTCDate() + daysUntilFri);
-  next.setUTCHours(13, 0, 0, 0);
+  next.setUTCHours(12, 0, 0, 0);
   return next;
 }
 
@@ -38,7 +38,7 @@ function useCountdown() {
   useEffect(() => {
     function calc() {
       if (isLiveNow()) return { d: 0, h: 0, m: 0, s: 0, live: true };
-      const ms = getNextFriday13UTC().getTime() - Date.now();
+      const ms = getNextFriday12UTC().getTime() - Date.now();
       if (ms <= 0) return { d: 0, h: 0, m: 0, s: 0, live: false };
       const s = Math.floor(ms / 1000) % 60;
       const m = Math.floor(ms / 60000) % 60;
@@ -67,7 +67,7 @@ function OfficeHoursCard() {
     <div className="col-span-6 md:col-span-4 rounded-[16px] p-gutter flex flex-col gap-4 overflow-hidden relative min-h-[200px] border">
       <div>
         <span className="h5 sans block">Developer office hours</span>
-        <span className="body-tiny opacity-50 mt-1 block">Every Friday · 13:00 UTC</span>
+        <span className="body-tiny opacity-50 mt-1 block">Every Friday · 12:00 UTC</span>
       </div>
 
       {/* Live indicator or Countdown */}
@@ -119,8 +119,8 @@ function OfficeHoursCard() {
               "VERSION:2.0",
               "PRODID:-//Logos//Office Hours//EN",
               "BEGIN:VEVENT",
-              "DTSTART:20250328T130000Z",
-              "DTEND:20250328T140000Z",
+              "DTSTART:20250328T120000Z",
+              "DTEND:20250328T130000Z",
               "RRULE:FREQ=WEEKLY;BYDAY=FR",
               "SUMMARY:Logos Developer Office Hours",
               "DESCRIPTION:Weekly office hours with the Logos engineering team.\\nJoin: " + OFFICE_HOURS_URL,
