@@ -11,24 +11,24 @@ import cx from "classnames";
 import type { GetStaticProps } from "next";
 import { trackEvent } from "@/context/UmamiProvider";
 
-/* ── Countdown to next Friday 13:00 UTC ── */
+/* ── Countdown to next Friday 12:00 UTC ── */
 function isLiveNow(): boolean {
   const now = new Date();
-  return now.getUTCDay() === 5 && now.getUTCHours() >= 13 && now.getUTCHours() < 14;
+  return now.getUTCDay() === 5 && now.getUTCHours() >= 12 && now.getUTCHours() < 13;
 }
 
-function getNextFriday13UTC(): Date {
+function getNextFriday12UTC(): Date {
   const now = new Date();
   const utcDay = now.getUTCDay(); // 0=Sun … 5=Fri
   const utcHour = now.getUTCHours();
   let daysUntilFri = (5 - utcDay + 7) % 7;
-  // If it's Friday and the session is over (>= 14:00 UTC), jump to next week
-  if (daysUntilFri === 0 && utcHour >= 14) {
+  // If it's Friday and the session is over (>= 13:00 UTC), jump to next week
+  if (daysUntilFri === 0 && utcHour >= 13) {
     daysUntilFri = 7;
   }
   const next = new Date(now);
   next.setUTCDate(now.getUTCDate() + daysUntilFri);
-  next.setUTCHours(13, 0, 0, 0);
+  next.setUTCHours(12, 0, 0, 0);
   return next;
 }
 
@@ -38,7 +38,7 @@ function useCountdown() {
   useEffect(() => {
     function calc() {
       if (isLiveNow()) return { d: 0, h: 0, m: 0, s: 0, live: true };
-      const ms = getNextFriday13UTC().getTime() - Date.now();
+      const ms = getNextFriday12UTC().getTime() - Date.now();
       if (ms <= 0) return { d: 0, h: 0, m: 0, s: 0, live: false };
       const s = Math.floor(ms / 1000) % 60;
       const m = Math.floor(ms / 60000) % 60;
@@ -67,7 +67,7 @@ function OfficeHoursCard() {
     <div className="col-span-6 md:col-span-4 rounded-[16px] p-gutter flex flex-col gap-4 overflow-hidden relative min-h-[200px] border">
       <div>
         <span className="h5 sans block">Developer office hours</span>
-        <span className="body-tiny opacity-50 mt-1 block">Every Friday · 13:00 UTC</span>
+        <span className="body-tiny opacity-50 mt-1 block">Every Friday · 12:00 UTC</span>
       </div>
 
       {/* Live indicator or Countdown */}
@@ -119,8 +119,8 @@ function OfficeHoursCard() {
               "VERSION:2.0",
               "PRODID:-//Logos//Office Hours//EN",
               "BEGIN:VEVENT",
-              "DTSTART:20250328T130000Z",
-              "DTEND:20250328T140000Z",
+              "DTSTART:20250328T120000Z",
+              "DTEND:20250328T130000Z",
               "RRULE:FREQ=WEEKLY;BYDAY=FR",
               "SUMMARY:Logos Developer Office Hours",
               "DESCRIPTION:Weekly office hours with the Logos engineering team.\\nJoin: " + OFFICE_HOURS_URL,
@@ -367,10 +367,82 @@ export default function Home() {
                 {/*  Full bento grid  */}
                 <ScrollEntrance className="grid grid-cols-6 md:grid-cols-12 gap-gutter">
 
-                  {/*  PHASE 01: GET INSPIRED  */}
-                  {/* Phase label  spans full width */}
+                  {/*  PHASE 01: PARTICIPATE  */}
                   <div className="col-span-6 md:col-span-12 flex items-end gap-4 pb-2">
                     <span className="font-mono text-[3rem] md:text-[4.5rem] leading-none font-light opacity-[0.07] select-none">01</span>
+                    <h3 className="h4 sans pb-1">Participate</h3>
+                    <div className="flex-1 h-px bg-current opacity-10 mb-3" />
+                  </div>
+
+                  {/* Install Basecamp  with app preview */}
+                  <Link
+                    to="https://github.com/logos-co/logos-app/releases"
+                    target="_blank"
+                    className="group col-span-6 md:col-span-5 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[280px] flex flex-col"
+                    style={{ background: "var(--color-light-blue)" }}
+                    onClick={trackClick("install_logos_basecamp")}
+                  >
+                    {/* App screenshot */}
+                    <div className="mx-gutter mt-gutter flex-1 overflow-hidden rounded-t-[12px] transition-transform group-hover:-translate-y-1">
+                      <img src="/basecamp.png" alt="Logos Basecamp" className="w-full h-full object-cover object-top" />
+                    </div>
+                    <div className="p-gutter">
+                      <div className="flex items-baseline justify-between">
+                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Install Logos Basecamp</span>
+                        <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
+                      </div>
+                      <p className="body-tiny opacity-60 mt-2">
+                        Leverage the interface to the parallel society and experiment with the applications available in the Alpha Release.
+                      </p>
+                    </div>
+                  </Link>
+
+                  {/* Run a Node  terminal style */}
+                  <Link
+                    to="https://github.com/logos-co/logos-docs/blob/main/docs/blockchain/quickstart-guide-for-the-logos-blockchain-node.md"
+                    target="_blank"
+                    className="group col-span-6 md:col-span-7 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[280px] flex flex-col theme-dark"
+                    style={{ background: "var(--color-dark-green)" }}
+                    onClick={trackClick("run_node_cli")}
+                  >
+                    {/* Terminal mock */}
+                    <div className="mx-gutter mt-gutter rounded-t-[8px] bg-white/5 flex-1 flex flex-col overflow-hidden transition-transform group-hover:-translate-y-1">
+                      <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/5">
+                        <div className="w-2 h-2 rounded-full bg-white/10" />
+                        <div className="w-2 h-2 rounded-full bg-white/10" />
+                        <div className="w-2 h-2 rounded-full bg-white/10" />
+                        <span className="text-[10px] opacity-20 ml-2 font-mono">terminal</span>
+                      </div>
+                      <div className="p-4 font-mono text-xs space-y-1 flex-1">
+                        <p className="opacity-60"><span className="opacity-40">$</span> curl -s http://localhost:8080/network/info | jq</p>
+                        <p className="opacity-40">{"{"}</p>
+                        <p className="opacity-40">  &quot;listen_addresses&quot;: [</p>
+                        <p className="opacity-40">    &quot;/ip4/127.0.0.1/udp/3000/quic-v1&quot;,</p>
+                        <p className="opacity-40">    &quot;/ip4/172.18.0.2/udp/3000/quic-v1&quot;</p>
+                        <p className="opacity-40">  ],</p>
+                        <p className="opacity-40">  &quot;peer_id&quot;: <span className="text-teal opacity-70">&quot;12D3Koo...RWmwmt&quot;</span>,</p>
+                        <p className="opacity-40">  &quot;n_peers&quot;: <span className="text-teal opacity-70">4</span>,</p>
+                        <p className="opacity-40">  &quot;n_connections&quot;: <span className="text-teal opacity-70">7</span>,</p>
+                        <p className="opacity-40">  &quot;n_pending_connections&quot;: <span className="text-teal opacity-70">3</span></p>
+                        <p className="opacity-40">{"}"}</p>
+                        <p className="opacity-60 mt-2"><span className="opacity-40">$</span> <span className="inline-block w-[5px] h-[10px] bg-teal/70 opacity-0 group-hover:animate-blink" /></p>
+                      </div>
+                    </div>
+                    <div className="p-gutter">
+                      <div className="flex items-baseline justify-between">
+                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Run a Node using CLI</span>
+                        <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
+                      </div>
+                      <p className="body-tiny opacity-40 mt-2">
+                        Participate in the network by becoming a node operator. Connect to the testnet in minutes and engage with the protocol.
+                      </p>
+                    </div>
+                  </Link>
+
+                  {/*  PHASE 02: GET INSPIRED  */}
+                  {/* Phase label  spans full width */}
+                  <div className="col-span-6 md:col-span-12 flex items-end gap-4 mt-gutter pb-2">
+                    <span className="font-mono text-[3rem] md:text-[4.5rem] leading-none font-light opacity-[0.07] select-none">02</span>
                     <h3 className="h4 sans pb-1">Get Inspired</h3>
                     <div className="flex-1 h-px bg-current opacity-10 mb-3" />
                   </div>
@@ -472,78 +544,6 @@ export default function Home() {
                     <p className="body-tiny opacity-60 max-w-[28em]">
                       Pick up a good first issue and ship your first PR.
                     </p>
-                  </Link>
-
-                  {/*  PHASE 02: TRY  */}
-                  <div className="col-span-6 md:col-span-12 flex items-end gap-4 mt-gutter pb-2">
-                    <span className="font-mono text-[3rem] md:text-[4.5rem] leading-none font-light opacity-[0.07] select-none">02</span>
-                    <h3 className="h4 sans pb-1">Participate</h3>
-                    <div className="flex-1 h-px bg-current opacity-10 mb-3" />
-                  </div>
-
-                  {/* Install Basecamp  with app preview */}
-                  <Link
-                    to="https://github.com/logos-co/logos-app/releases"
-                    target="_blank"
-                    className="group col-span-6 md:col-span-5 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[280px] flex flex-col"
-                    style={{ background: "var(--color-light-blue)" }}
-                    onClick={trackClick("install_logos_basecamp")}
-                  >
-                    {/* App screenshot */}
-                    <div className="mx-gutter mt-gutter flex-1 overflow-hidden rounded-t-[12px] transition-transform group-hover:-translate-y-1">
-                      <img src="/basecamp.png" alt="Logos Basecamp" className="w-full h-full object-cover object-top" />
-                    </div>
-                    <div className="p-gutter">
-                      <div className="flex items-baseline justify-between">
-                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Install Logos Basecamp</span>
-                        <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
-                      </div>
-                      <p className="body-tiny opacity-60 mt-2">
-                        Leverage the interface to the parallel society and experiment with the applications available in the Alpha Release.
-                      </p>
-                    </div>
-                  </Link>
-
-                  {/* Run a Node  terminal style */}
-                  <Link
-                    to="https://github.com/logos-co/logos-docs/blob/main/docs/blockchain/quickstart-guide-for-the-logos-blockchain-node.md"
-                    target="_blank"
-                    className="group col-span-6 md:col-span-7 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[280px] flex flex-col theme-dark"
-                    style={{ background: "var(--color-dark-green)" }}
-                    onClick={trackClick("run_node_cli")}
-                  >
-                    {/* Terminal mock */}
-                    <div className="mx-gutter mt-gutter rounded-t-[8px] bg-white/5 flex-1 flex flex-col overflow-hidden transition-transform group-hover:-translate-y-1">
-                      <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/5">
-                        <div className="w-2 h-2 rounded-full bg-white/10" />
-                        <div className="w-2 h-2 rounded-full bg-white/10" />
-                        <div className="w-2 h-2 rounded-full bg-white/10" />
-                        <span className="text-[10px] opacity-20 ml-2 font-mono">terminal</span>
-                      </div>
-                      <div className="p-4 font-mono text-xs space-y-1 flex-1">
-                        <p className="opacity-60"><span className="opacity-40">$</span> curl -s http://localhost:8080/network/info | jq</p>
-                        <p className="opacity-40">{"{"}</p>
-                        <p className="opacity-40">  &quot;listen_addresses&quot;: [</p>
-                        <p className="opacity-40">    &quot;/ip4/127.0.0.1/udp/3000/quic-v1&quot;,</p>
-                        <p className="opacity-40">    &quot;/ip4/172.18.0.2/udp/3000/quic-v1&quot;</p>
-                        <p className="opacity-40">  ],</p>
-                        <p className="opacity-40">  &quot;peer_id&quot;: <span className="text-teal opacity-70">&quot;12D3Koo...RWmwmt&quot;</span>,</p>
-                        <p className="opacity-40">  &quot;n_peers&quot;: <span className="text-teal opacity-70">4</span>,</p>
-                        <p className="opacity-40">  &quot;n_connections&quot;: <span className="text-teal opacity-70">7</span>,</p>
-                        <p className="opacity-40">  &quot;n_pending_connections&quot;: <span className="text-teal opacity-70">3</span></p>
-                        <p className="opacity-40">{"}"}</p>
-                        <p className="opacity-60 mt-2"><span className="opacity-40">$</span> <span className="inline-block w-[5px] h-[10px] bg-teal/70 opacity-0 group-hover:animate-blink" /></p>
-                      </div>
-                    </div>
-                    <div className="p-gutter">
-                      <div className="flex items-baseline justify-between">
-                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Run a Node using CLI</span>
-                        <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
-                      </div>
-                      <p className="body-tiny opacity-40 mt-2">
-                        Participate in the network by becoming a node operator. Connect to the testnet in minutes and engage with the protocol.
-                      </p>
-                    </div>
                   </Link>
 
                   {/*  PHASE 03: BUILD  */}
