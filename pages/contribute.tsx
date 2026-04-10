@@ -8,6 +8,10 @@ import SiteLayout from "@components/SiteLayout";
 import cx from "classnames";
 import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import { fetchGoodFirstIssues, type IssueData } from "@/lib/issues";
+import ContributionStats, {
+  type ContributionStats as ContributionStatsType,
+} from "@components/ContributionStats";
+import { fetchContributionStats } from "@components/ContributionStats/api";
 
 /* ───────────── Helpers ──────────────────────────────────────── */
 
@@ -35,6 +39,7 @@ function labelColor(hex: string): React.CSSProperties {
 export default function ContributePage({
   issues,
   repos,
+  stats,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [activeRepo, setActiveRepo] = useState<string>("all");
 
@@ -99,6 +104,9 @@ export default function ContributePage({
                 </ScrollEntrance>
               </div>
             </section>
+
+            {/* ── Stats ── */}
+            {stats && <ContributionStats stats={stats} />}
 
             {/* ── Issues Table ── */}
             <section className="pb-v-space theme-default">
@@ -227,14 +235,23 @@ export default function ContributePage({
 export const getStaticProps: GetStaticProps<{
   issues: IssueData[];
   repos: string[];
+  stats: ContributionStatsType | null;
 }> = async () => {
   try {
     const issues = await fetchGoodFirstIssues();
     const repoSet = new Set(issues.map((i) => i.repo));
     const repos = Array.from(repoSet).sort();
-    return { props: { issues, repos } };
+
+    let stats: ContributionStatsType | null = null;
+    try {
+      stats = await fetchContributionStats();
+    } catch (statsErr) {
+      console.error("Failed to fetch contribution stats:", statsErr);
+    }
+
+    return { props: { issues, repos, stats } };
   } catch (err) {
     console.error("Failed to fetch issues:", err);
-    return { props: { issues: [], repos: [] } };
+    return { props: { issues: [], repos: [], stats: null } };
   }
 };
