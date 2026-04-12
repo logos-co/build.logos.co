@@ -123,16 +123,16 @@ export default function RfpPage() {
     <SiteLayout>
       <Head>
         <title>RFPs | Logos Builders Hub</title>
-        <meta name="description" content="Apply for funded proposals. The Logos RFP Program backs developers building on the decentralized tech stack." />
+        <meta name="description" content="Apply for supported proposals. The Logos RFP Program backs developers building on the decentralized tech stack." />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="RFPs | Logos Builders Hub" />
-        <meta property="og:description" content="Apply for funded proposals. The Logos RFP Program backs developers building on the decentralized tech stack." />
+        <meta property="og:description" content="Apply for supported proposals. The Logos RFP Program backs developers building on the decentralized tech stack." />
         <meta property="og:url" content="https://build.logos.co/rfp" />
         <meta property="og:image" content="https://build.logos.co/og.jpg" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@Logos_network" />
         <meta name="twitter:title" content="RFPs | Logos Builders Hub" />
-        <meta name="twitter:description" content="Apply for funded proposals. The Logos RFP Program backs developers building on the stack." />
+        <meta name="twitter:description" content="Apply for supported proposals. The Logos RFP Program backs developers building on the stack." />
         <link rel="canonical" href="https://build.logos.co/rfp" />
       </Head>
             {/* ── Back Link ── */}
