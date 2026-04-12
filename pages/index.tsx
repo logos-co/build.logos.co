@@ -713,7 +713,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="body-tiny opacity-60 max-w-[24em]">
-                        Apply for funded proposals. The Logos RFP Program backs developers building on the stack.
+                        Apply for supported proposals. The Logos RFP Program backs developers building on the stack.
                       </p>
                     </div>
                     {/* Decorative layers */}
