@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Head from "next/head";
 import Link from "@components/Link";
 import TextLink from "@components/TextLink";
@@ -34,19 +34,34 @@ function labelColor(hex: string): React.CSSProperties {
   };
 }
 
+function prefixOf(title: string): string | null {
+  const m = title.match(/^\s*([\w-]+)\s*:/);
+  return m ? m[1].toLowerCase() : null;
+}
+
 /* ──────────────────────── Page ──────────────────────────────── */
 
 export default function ContributePage({
   issues,
-  repos,
   stats,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const [activeRepo, setActiveRepo] = useState<string>("all");
+  const [activePrefix, setActivePrefix] = useState<string>("all");
+
+  const prefixes = useMemo(() => {
+    const counts = new Map<string, number>();
+    issues.forEach((i) => {
+      const p = prefixOf(i.title);
+      if (p) counts.set(p, (counts.get(p) ?? 0) + 1);
+    });
+    return [...counts.entries()].sort(
+      (a, b) => b[1] - a[1] || a[0].localeCompare(b[0])
+    );
+  }, [issues]);
 
   const filtered =
-    activeRepo === "all"
+    activePrefix === "all"
       ? issues
-      : issues.filter((i) => i.repo === activeRepo);
+      : issues.filter((i) => prefixOf(i.title) === activePrefix);
 
   return (
     <SiteLayout>
@@ -117,40 +132,37 @@ export default function ContributePage({
 
                     {/* Table header / toolbar */}
                     <div className="bg-dark-green/[0.03] px-gutter py-3 flex flex-wrap items-center justify-between gap-3 border-b">
-                      {/* Repo filter tabs */}
+                      {/* Prefix filter tabs */}
                       <div className="flex flex-wrap items-center gap-1.5">
                         <button
-                          onClick={() => setActiveRepo("all")}
+                          onClick={() => setActivePrefix("all")}
                           className={cx(
                             "text-xs px-2.5 py-1 rounded-md cursor-pointer transition-colors",
                             {
-                              "bg-dark-green text-bg font-medium": activeRepo === "all",
-                              "hover:bg-dark-green/5 opacity-60 hover:opacity-100": activeRepo !== "all",
+                              "bg-dark-green text-bg font-medium": activePrefix === "all",
+                              "hover:bg-dark-green/5 opacity-60 hover:opacity-100": activePrefix !== "all",
                             }
                           )}
                         >
                           All
                           <span className="ml-1.5 opacity-60">{issues.length}</span>
                         </button>
-                        {repos.map((repo) => {
-                          const count = issues.filter((i) => i.repo === repo).length;
-                          return (
-                            <button
-                              key={repo}
-                              onClick={() => setActiveRepo(repo)}
-                              className={cx(
-                                "text-xs px-2.5 py-1 rounded-md cursor-pointer transition-colors",
-                                {
-                                  "bg-dark-green text-bg font-medium": activeRepo === repo,
-                                  "hover:bg-dark-green/5 opacity-60 hover:opacity-100": activeRepo !== repo,
-                                }
-                              )}
-                            >
-                              {repo}
-                              <span className="ml-1.5 opacity-60">{count}</span>
-                            </button>
-                          );
-                        })}
+                        {prefixes.map(([prefix, count]) => (
+                          <button
+                            key={prefix}
+                            onClick={() => setActivePrefix(prefix)}
+                            className={cx(
+                              "text-xs px-2.5 py-1 rounded-md cursor-pointer transition-colors",
+                              {
+                                "bg-dark-green text-bg font-medium": activePrefix === prefix,
+                                "hover:bg-dark-green/5 opacity-60 hover:opacity-100": activePrefix !== prefix,
+                              }
+                            )}
+                          >
+                            {prefix}
+                            <span className="ml-1.5 opacity-60">{count}</span>
+                          </button>
+                        ))}
                       </div>
                       {/* Issue count */}
                       <span className="text-xs opacity-40">
@@ -218,7 +230,7 @@ export default function ContributePage({
                     ) : (
                       <div className="py-v-space text-center">
                         <p className="body-tiny opacity-60">
-                          No issues found{activeRepo !== "all" ? ` in ${activeRepo}` : ""}.
+                          No issues found{activePrefix !== "all" ? ` for "${activePrefix}"` : ""}.
                         </p>
                       </div>
                     )}
@@ -234,13 +246,10 @@ export default function ContributePage({
 
 export const getStaticProps: GetStaticProps<{
   issues: IssueData[];
-  repos: string[];
   stats: ContributionStatsType | null;
 }> = async () => {
   try {
     const issues = await fetchGoodFirstIssues();
-    const repoSet = new Set(issues.map((i) => i.repo));
-    const repos = Array.from(repoSet).sort();
 
     let stats: ContributionStatsType | null = null;
     try {
@@ -249,9 +258,9 @@ export const getStaticProps: GetStaticProps<{
       console.error("Failed to fetch contribution stats:", statsErr);
     }
 
-    return { props: { issues, repos, stats } };
+    return { props: { issues, stats } };
   } catch (err) {
     console.error("Failed to fetch issues:", err);
-    return { props: { issues: [], repos: [], stats: null } };
+    return { props: { issues: [], stats: null } };
   }
 };
