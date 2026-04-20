@@ -376,7 +376,7 @@ export default function Home() {
 
                   {/* Install Basecamp  with app preview */}
                   <Link
-                    to="https://github.com/logos-co/logos-app/releases"
+                    to="https://github.com/logos-co/logos-basecamp/releases?q=prerelease%3Afalse&expanded=true"
                     target="_blank"
                     className="group col-span-6 md:col-span-5 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[280px] flex flex-col"
                     style={{ background: "var(--color-light-blue)" }}
@@ -898,7 +898,7 @@ export default function Home() {
                         </p>
                         <div className="mt-4">
                           <Button
-                            to="https://github.com/logos-co/logos-app/releases"
+                            to="https://github.com/logos-co/logos-basecamp/releases?q=prerelease%3Afalse&expanded=true"
                             target="_blank"
                             className="secondary"
                             arrow
