@@ -391,7 +391,7 @@ export default function Home() {
                         <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Install Logos Basecamp</span>
                         <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                       </div>
-                      <p className="body-tiny opacity-60 mt-2">
+                      <p className="body-small opacity-60 mt-2">
                         Leverage the interface to the parallel society and experiment with the applications available in the Alpha Release.
                       </p>
                     </div>
@@ -433,7 +433,7 @@ export default function Home() {
                         <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Run a Node using CLI</span>
                         <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                       </div>
-                      <p className="body-tiny opacity-40 mt-2">
+                      <p className="body-small opacity-40 mt-2">
                         Participate in the network by becoming a node operator. Connect to the testnet in minutes and engage with the protocol.
                       </p>
                     </div>
@@ -495,7 +495,7 @@ export default function Home() {
                         style={{ background: "linear-gradient(to right, transparent, var(--color-tan))" }}
                       />
                     </div>
-                    <p className="body-tiny opacity-60 max-w-[28em]">
+                    <p className="body-small opacity-60 max-w-[28em]">
                       Browse ideas from the community, vote on the ones you love, or propose your own.
                     </p>
                   </Link>
@@ -515,20 +515,20 @@ export default function Home() {
                       {/* Toolbar */}
                       <div className="flex items-center gap-2 px-2.5 py-1.5 bg-current/[0.03] border-b border-current/10">
                         <span className="px-1.5 py-0.5 rounded bg-dark-green text-bg text-[9px]">All</span>
-                        <span className="opacity-30">blockchain</span>
-                        <span className="opacity-30">messaging</span>
-                        <span className="opacity-30">storage</span>
+                        <span className="h-1.5 w-14 rounded-full bg-current/10" />
+                        <span className="h-1.5 w-16 rounded-full bg-current/10" />
+                        <span className="h-1.5 w-12 rounded-full bg-current/10" />
                       </div>
                       {/* Issue rows */}
                       {[
-                        { title: "Add retry logic to discovery", repo: "messaging", color: "text-teal" },
-                        { title: "Fix pagination in REST API", repo: "storage", color: "" },
-                        { title: "Update quickstart docs", repo: "blockchain", color: "" },
-                        { title: "Improve error messages", repo: "messaging", color: "" },
-                        { title: "Add unit tests for validator", repo: "blockchain", color: "" },
+                        { w: "w-[70%]", r: "w-10", tint: true },
+                        { w: "w-[55%]", r: "w-12", tint: false },
+                        { w: "w-[65%]", r: "w-10", tint: false },
+                        { w: "w-[50%]", r: "w-14", tint: false },
+                        { w: "w-[60%]", r: "w-10", tint: false },
                       ].map((row, i) => (
                         <div
-                          key={row.title}
+                          key={i}
                           className={`flex items-center gap-2 px-2.5 py-1.5 border-b border-current/5 transition-all ${i === 0 ? "group-hover:bg-current/[0.04]" : ""}`}
                           style={{ transitionDelay: `${i * 60}ms` }}
                         >
@@ -536,12 +536,15 @@ export default function Home() {
                             <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
                             <circle cx="8" cy="8" r="2" fill="currentColor" />
                           </svg>
-                          <span className={`truncate opacity-50 transition-opacity group-hover:opacity-70 ${row.color}`} style={{ transitionDelay: `${i * 60}ms` }}>{row.title}</span>
-                          <span className="ml-auto opacity-20 shrink-0">{row.repo}</span>
+                          <span
+                            className={`h-1.5 ${row.w} rounded-full transition-opacity group-hover:opacity-80 ${row.tint ? "bg-teal/25" : "bg-current/10"}`}
+                            style={{ transitionDelay: `${i * 60}ms` }}
+                          />
+                          <span className={`ml-auto h-1.5 ${row.r} rounded-full bg-current/5 shrink-0`} />
                         </div>
                       ))}
                     </div>
-                    <p className="body-tiny opacity-60 max-w-[28em]">
+                    <p className="body-small opacity-60 max-w-[28em]">
                       Pick up a good first issue and ship your first PR.
                     </p>
                   </Link>
@@ -565,7 +568,7 @@ export default function Home() {
                         <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Read the Docs</span>
                         <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                       </div>
-                      <p className="body-tiny opacity-60 max-w-[24em]">
+                      <p className="body-small opacity-60 max-w-[24em]">
                         Deep-dive into the Logos stack  architecture, modules, APIs, and integration guides.
                       </p>
                     </div>
@@ -590,7 +593,7 @@ export default function Home() {
                       <span className="h6 sans transition-transform group-hover:-translate-y-0.5">Scaffold boilerplate</span>
                       <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                     </div>
-                    <p className="body-tiny opacity-50">
+                    <p className="body-small opacity-50">
                       Start with a boilerplate.
                     </p>
                   </Link>
@@ -620,7 +623,7 @@ export default function Home() {
                         </div>
                       ))}
                     </div>
-                    <p className="body-tiny opacity-50">
+                    <p className="body-small opacity-50">
                       Real-world examples to learn from.
                     </p>
                   </button>
@@ -645,7 +648,7 @@ export default function Home() {
                         <span className="h6 sans transition-transform group-hover:-translate-y-0.5">Workshops &amp; tutorials</span>
                         <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                       </div>
-                      <p className="body-tiny opacity-70">
+                      <p className="body-small opacity-70">
                         Live coding sessions and step-by-step guides.
                       </p>
                     </div>
@@ -664,7 +667,7 @@ export default function Home() {
                       <span className="h6 sans transition-transform group-hover:-translate-y-0.5">Developer support</span>
                       <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                     </div>
-                    <p className="body-tiny opacity-50">
+                    <p className="body-small opacity-50">
                       Discord, X, community forum, and the research forum.
                     </p>
                   </button>
@@ -689,7 +692,7 @@ export default function Home() {
                       <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                     </div>
                     <div>
-                      <p className="body-tiny opacity-40 max-w-[24em]">
+                      <p className="body-small opacity-40 max-w-[24em]">
                         Compete for prizes by building on the Logos execution layer. Ship code, win support.
                       </p>
                     </div>
@@ -712,7 +715,7 @@ export default function Home() {
                       <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                     </div>
                     <div>
-                      <p className="body-tiny opacity-60 max-w-[24em]">
+                      <p className="body-small opacity-60 max-w-[24em]">
                         Apply for supported proposals. The Logos RFP Program backs developers building on the stack.
                       </p>
                     </div>
@@ -736,8 +739,8 @@ export default function Home() {
                       <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Speak to a core contributor</span>
                       <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                     </div>
-                    <p className="body-tiny opacity-60 mt-auto">
-                      Get direct guidance from the people building the Logos stack. Book a call with a core contributor.
+                    <p className="body-small opacity-60 mt-auto">
+                      Get direct guidance from the people building the Logos stack.
                     </p>
                   </Link>
 
@@ -752,7 +755,7 @@ export default function Home() {
                       <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Logos community forum</span>
                       <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
                     </div>
-                    <p className="body-tiny opacity-60 mt-auto">
+                    <p className="body-small opacity-60 mt-auto">
                       Discuss research, ask technical questions, and connect with the broader Logos community.
                     </p>
                   </Link>
