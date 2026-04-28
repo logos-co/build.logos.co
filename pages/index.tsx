@@ -264,19 +264,16 @@ const MODULES = [
     name: "Blockchain",
     desc: "Advanced privacy for a new era of decentralised applications and social institutions.",
     bg: "var(--color-dark-green)",
-    fg: "var(--color-bg)",
   },
   {
     name: "Messaging",
     desc: "Private peer‑to‑peer communication that resists surveillance and censorship.",
     bg: "var(--color-grey-5)",
-    fg: "var(--color-bg)",
   },
   {
     name: "Storage",
     desc: "Secure decentralised storage enabling fully decentralised apps and file sharing.",
     bg: "var(--color-grey-2)",
-    fg: "var(--color-dark-green)",
   },
 ];
 
@@ -308,12 +305,31 @@ function ModulesShowcase() {
     return () => cancelAnimationFrame(raf);
   }, [activeIdx]);
 
+  const globalProgress = (activeIdx + progress) / MODULES.length;
+
   return (
     <ul
-      className="flex flex-col flex-1 justify-between"
+      className="relative flex flex-col flex-1 justify-between gap-3 pl-4 pr-4"
       onMouseEnter={() => { pausedRef.current = true; }}
       onMouseLeave={() => { pausedRef.current = false; }}
+      style={{ color: "var(--color-grey-6)" }}
     >
+      {/* Single vertical track spanning the whole list */}
+      <div
+        aria-hidden="true"
+        className="absolute left-0 top-0 bottom-0 w-px overflow-hidden"
+        style={{ background: "color-mix(in srgb, currentColor 12%, transparent)" }}
+      >
+        <div
+          className="absolute inset-x-0 top-0 transition-colors duration-500"
+          style={{
+            height: `${globalProgress * 100}%`,
+            background: MODULES[activeIdx].bg,
+            opacity: 0.7,
+          }}
+        />
+      </div>
+
       {MODULES.map((m, idx) => {
         const isActive = idx === activeIdx;
         return (
@@ -321,68 +337,42 @@ function ModulesShowcase() {
             key={m.name}
             onClick={() => setActiveIdx(idx)}
             className="cursor-pointer select-none transition-opacity duration-500"
-            style={{ opacity: isActive ? 1 : 0.4 }}
+            style={{ opacity: isActive ? 1 : 0.45 }}
           >
-            {/* Header row: icon + name (always visible) */}
-            <div className="flex items-center gap-3 py-2">
+            <div className="flex items-baseline gap-2">
               <span
                 aria-hidden="true"
-                className="flex items-center justify-center w-9 h-9 rounded-md shrink-0 transition-transform duration-500"
+                className="block w-[10px] h-[13px] shrink-0 translate-y-[2px]"
                 style={{
-                  background: m.bg,
-                  transform: isActive ? "scale(1.06)" : "scale(1)",
-                  boxShadow: isActive ? `0 4px 12px -6px ${m.bg}` : "none",
+                  background: "currentColor",
+                  WebkitMaskImage: "url(/mark.svg)",
+                  maskImage: "url(/mark.svg)",
+                  WebkitMaskRepeat: "no-repeat",
+                  maskRepeat: "no-repeat",
+                  WebkitMaskPosition: "center",
+                  maskPosition: "center",
+                  WebkitMaskSize: "contain",
+                  maskSize: "contain",
                 }}
-              >
-                <span
-                  className="block w-[13px] h-[17px]"
-                  style={{
-                    background: m.fg,
-                    WebkitMaskImage: "url(/mark.svg)",
-                    maskImage: "url(/mark.svg)",
-                    WebkitMaskRepeat: "no-repeat",
-                    maskRepeat: "no-repeat",
-                    WebkitMaskPosition: "center",
-                    maskPosition: "center",
-                    WebkitMaskSize: "contain",
-                    maskSize: "contain",
-                  }}
-                />
-              </span>
-              <span className="h4 sans leading-tight">
-                {m.name}
-              </span>
+              />
+              <span className="body-medium mono font-semibold">{m.name}</span>
             </div>
 
             {/*
-              Synchronized expand/collapse. Each item transitions its row from
-              0fr ↔ 1fr. Because exactly one item is active and the others
-              transition in lockstep, the total list height stays stable —
-              so the hero watermark below doesn't shift around.
+              Synchronized expand/collapse via grid-template-rows.
+              Because exactly one item is active at a time and the
+              old/new transitions run in lockstep, the total list
+              height stays effectively constant — so the hero
+              watermark below doesn't drift around.
             */}
             <div
               className="grid transition-[grid-template-rows] duration-500 ease-out"
               style={{ gridTemplateRows: isActive ? "1fr" : "0fr" }}
             >
               <div className="overflow-hidden">
-                <div className="pl-12 pr-2 pb-3">
-                  <p className="body-small mono opacity-65">
-                    {m.desc}
-                  </p>
-                  <div
-                    className="mt-3 h-px relative overflow-hidden"
-                    style={{ background: "color-mix(in srgb, currentColor 10%, transparent)" }}
-                  >
-                    <div
-                      className="absolute inset-y-0 left-0"
-                      style={{
-                        width: `${(isActive ? progress : 0) * 100}%`,
-                        background: m.bg,
-                        opacity: 0.55,
-                      }}
-                    />
-                  </div>
-                </div>
+                <p className="body-medium mono opacity-60 pl-[18px] pt-1 max-w-[34em]">
+                  {m.desc}
+                </p>
               </div>
             </div>
           </li>
@@ -497,10 +487,11 @@ export default function Home() {
 
                   {/* Intro paragraph + nav cards */}
                   <div className="grid grid-cols-12 gap-gutter items-stretch">
-                    <div className="col-span-12 md:col-span-5 flex flex-col gap-8">
+                    <div className="col-span-12 md:col-span-5 flex flex-col gap-6">
                       <p className="body-medium mono text-balance">
                         Logos is an open, modular technology stack for building decentralized, censorship-resistant applications that are built to safeguard your civil liberties.
                       </p>
+
                       <ModulesShowcase />
                     </div>
 
