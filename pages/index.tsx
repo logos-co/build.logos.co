@@ -430,15 +430,20 @@ export default function Home() {
               className="relative overflow-hidden theme-default pb-v-space"
               style={{ paddingTop: "calc(var(--spacing-header-height-expanded) + var(--spacing-gutter))" }}
             >
-              {/* Animated brand mark watermark */}
+              {/* Animated brand mark watermark — mobile fills viewport height (cover), desktop is bottom-right corner */}
               <AnimatedMark
-                className="pointer-events-none select-none absolute right-[10vw] -bottom-[6vw] w-[52vw] max-w-[720px] aspect-[20/26] opacity-[0.22]"
+                fit="cover"
+                className="pointer-events-none select-none absolute inset-x-0 bottom-0 h-screen opacity-[0.12] md:hidden"
+              />
+              <AnimatedMark
+                className="hidden md:block pointer-events-none select-none absolute aspect-[20/26] opacity-[0.22]
+                           md:right-[10vw] md:-bottom-[6vw] md:w-[52vw] md:max-w-[720px]"
               />
 
-              <div className="relative mx-auto px-[calc(var(--spacing-margin)*1.5)] max-w-site-max-w-margin">
+              <div className="relative mx-auto px-margin md:px-[calc(var(--spacing-margin)*1.5)] max-w-site-max-w-margin">
                 <ScrollEntrance>
                   {/* Top row: brand image + testnet disclaimer */}
-                  <div className="flex items-stretch justify-between gap-gutter mb-v-space-sm">
+                  <div className="flex flex-col md:flex-row md:items-stretch md:justify-between gap-6 md:gap-gutter mb-v-space-sm">
                     <div className="max-w-[120px] md:max-w-[150px]">
                       <Image
                         src="/header.avif"
@@ -449,7 +454,7 @@ export default function Home() {
                         priority
                       />
                     </div>
-                    <div className="hidden md:flex flex-col items-start justify-center gap-3 pl-3 border-l-2 max-w-[26em]" style={{ borderColor: "#FF6B2B" }}>
+                    <div className="flex flex-col items-start justify-center gap-3 pl-3 border-l-2 max-w-[26em]" style={{ borderColor: "#FF6B2B" }}>
                       <span
                         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border font-mono text-[10px] tracking-[0.15em] uppercase font-semibold"
                         style={{ borderColor: "#FF6B2B", color: "#FF6B2B" }}
@@ -486,16 +491,18 @@ export default function Home() {
                   </div>
 
                   {/* Intro paragraph + nav cards */}
-                  <div className="grid grid-cols-12 gap-gutter items-stretch">
+                  <div className="grid grid-cols-12 gap-x-gutter gap-y-v-space-sm md:gap-y-gutter items-stretch">
                     <div className="col-span-12 md:col-span-5 flex flex-col gap-6">
                       <p className="body-medium mono text-balance">
                         Logos is an open, modular technology stack for building decentralized, censorship-resistant applications that are built to safeguard your civil liberties.
                       </p>
 
-                      <ModulesShowcase />
+                      <div className="hidden md:flex flex-col flex-1">
+                        <ModulesShowcase />
+                      </div>
                     </div>
 
-                    <div className="col-span-12 md:col-span-7 grid grid-cols-1 xs:grid-cols-2 gap-gutter">
+                    <div className="col-span-12 md:col-span-7 grid grid-cols-2 gap-gutter">
                       {[
                         {
                           num: "01",
@@ -983,12 +990,12 @@ export default function Home() {
                 <div className="grid grid-cols-12 gap-gutter min-h-[320px] md:min-h-[420px]">
                   <blockquote className="col-span-12 md:col-span-7 lg:col-span-6 flex flex-col justify-between gap-v-space-sm">
                     <p className="h2 md:h1 leading-[1.04] text-balance">
-                      We don&apos;t need to fight. We already have the <em className="italic">tools</em> to peacefully resist tyranny.
+                      We are at the critical juncture where the old system meets the new <em className="italic">tools</em> built to replace it.
                     </p>
                     <footer className="flex items-center gap-3">
                       <span className="block w-8 h-px bg-current opacity-50" />
                       <cite className="not-italic font-mono text-[11px] tracking-[0.18em] uppercase opacity-70">
-                        The Logos Manifesto &middot; 2024
+                        Logos: A Declaration of Independence in Cyberspace &middot; Jarrad Hope
                       </cite>
                     </footer>
                   </blockquote>

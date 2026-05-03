@@ -6,6 +6,7 @@ type Props = {
   style?: React.CSSProperties;
   dotSize?: number;
   speed?: number;
+  fit?: "contain" | "cover";
 };
 
 const VERT = `
@@ -110,6 +111,7 @@ export default function AnimatedMark({
   style,
   dotSize = 4,
   speed = 1,
+  fit = "contain",
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -231,13 +233,22 @@ export default function AnimatedMark({
       resize();
       const elapsed = ((now - start) / 1000) * speed * (reducedMotion ? 0 : 1);
 
-      // Contain the texture within the canvas with correct aspect
+      // Aspect-fit the texture within the canvas. "contain" leaves transparent
+      // bands around the mark; "cover" fills the canvas and crops the mark.
       const canvasAspect = canvas.width / canvas.height;
       let ax = 1, ay = 1;
-      if (canvasAspect > texAspect) {
-        ax = canvasAspect / texAspect;
+      if (fit === "cover") {
+        if (canvasAspect > texAspect) {
+          ay = texAspect / canvasAspect;
+        } else {
+          ax = canvasAspect / texAspect;
+        }
       } else {
-        ay = texAspect / canvasAspect;
+        if (canvasAspect > texAspect) {
+          ax = canvasAspect / texAspect;
+        } else {
+          ay = texAspect / canvasAspect;
+        }
       }
 
       gl.clear(gl.COLOR_BUFFER_BIT);
@@ -266,7 +277,7 @@ export default function AnimatedMark({
       gl.deleteShader(vs);
       gl.deleteShader(fs);
     };
-  }, [src, dotSize, speed]);
+  }, [src, dotSize, speed, fit]);
 
   return <canvas ref={canvasRef} className={className} style={style} aria-hidden="true" />;
 }
