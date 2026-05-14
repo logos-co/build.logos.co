@@ -32,13 +32,11 @@ export const SiteHeader = () => (
 
 const footerLists = [
   {
-    title: "Work",
     links: [
       { label: "Work With Us", to: "https://free.technology/jobs", external: true },
     ],
   },
   {
-    title: "Social",
     links: [
       { label: "Twitter", to: "https://x.com/Logos_network", external: true },
       { label: "Discord", to: "https://discord.gg/logosnetwork", external: true },
@@ -51,17 +49,10 @@ const footerLists = [
 
 const footerLists2 = [
   {
-    title: "Research",
     links: [
       { label: "Logos Research", to: "https://research.logos.co/", external: true },
     ],
   },
-];
-
-const footerLegal = [
-  { label: "Terms & Conditions", to: "/terms-conditions" },
-  { label: "Privacy Policy", to: "/privacy-policy" },
-  { label: "Security", to: "/security" },
 ];
 
 const FooterLinkList = ({ title, links }: { title?: string; links: { label: string; to: string; external?: boolean }[] }) => (
@@ -117,45 +108,23 @@ export const SiteFooter = () => (
         {/* Work + Social */}
         {footerLists.map((list, index) => (
           <div
-            key={list.title}
+            key={index}
             className={cx({
               "md:row-start-2": true,
               "col-start-3 md:col-start-6": index % 2 !== 0,
               "col-start-1 md:col-start-4": index % 2 === 0,
             })}
           >
-            <FooterLinkList title={list.title} links={list.links} />
+            <FooterLinkList links={list.links} />
           </div>
         ))}
-
-        {/* Built by IFT */}
-        <div className="col-start-1 md:col-start-1 md:row-start-3">
-          <ul className="body-tiny">
-            <li>
-              <Link
-                to="https://free.technology/"
-                target="_blank"
-                className="transition-none! group cursor-pointer inline-block align-top py-[2px]"
-              >
-                <span className="animate-underline underlined py-[2px]">
-                  Built by IFT
-                </span>
-              </Link>
-            </li>
-          </ul>
-        </div>
 
         {/* Research */}
-        {footerLists2.map((list) => (
-          <div key={list.title} className="col-start-1 md:col-start-4 md:row-start-3">
-            <FooterLinkList title={list.title} links={list.links} />
+        {footerLists2.map((list, index) => (
+          <div key={index} className="col-start-1 md:col-start-4 md:row-start-3">
+            <FooterLinkList links={list.links} />
           </div>
         ))}
-
-        {/* Legal */}
-        <div className="col-start-3 md:col-start-4 md:row-start-4">
-          <FooterLinkList links={footerLegal} />
-        </div>
       </div>
     </div>
   </footer>

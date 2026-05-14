@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -iE \"\\\\.avif$|\\\\.png$|\\\\.svg$|\\\\.gif$\")",
+      "Bash(grep -n \", [a-z][a-z]*\\\\.$\\\\|, [a-z][a-z]* [a-z][a-z]*\\\\.$\" /Users/guru/Desktop/Logos/build/pages/index.tsx)"
+    ]
+  }
+}
