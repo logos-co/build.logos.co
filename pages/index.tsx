@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import Link from "@components/Link";
 import TextLink from "@components/TextLink";
-import Button from "@components/Button";
 import ScrollEntrance from "@components/ScrollEntrance";
 import SiteLayout from "@components/SiteLayout";
 import AnimatedMark from "@components/AnimatedMark";
@@ -58,45 +57,98 @@ function useCountdown() {
 /* ── Office Hours Card ── */
 const OFFICE_HOURS_URL = "https://meet.jit.si/FolkMemorialsRiskNext";
 
+/* Pill button shared across all hero/journey cards. */
+function PillButton({
+  children,
+  className = "",
+  variant = "dark",
+}: {
+  children: React.ReactNode;
+  className?: string;
+  variant?: "dark" | "light";
+}) {
+  const styles =
+    variant === "light"
+      ? { background: "var(--color-bg)", color: "var(--color-dark-green)" }
+      : { background: "var(--color-dark-green)", color: "var(--color-bg)" };
+  return (
+    <span
+      className={cx(
+        "inline-flex items-center gap-2 px-4 py-2 rounded-full font-mono text-[10px] tracking-[0.15em] uppercase font-semibold",
+        className
+      )}
+      style={styles}
+    >
+      {children}
+      <span aria-hidden="true">&rarr;</span>
+    </span>
+  );
+}
+
 function OfficeHoursCard() {
   const { asPath } = useRouter();
   const cd = useCountdown();
   const pad = (n: number) => String(n).padStart(2, "0");
   const live = cd?.live ?? false;
 
+  const downloadIcs = () => {
+    trackEvent("office_hours_add_calendar", { source: asPath });
+    const ics = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Logos//Office Hours//EN",
+      "BEGIN:VEVENT",
+      "DTSTART:20250328T120000Z",
+      "DTEND:20250328T130000Z",
+      "RRULE:FREQ=WEEKLY;BYDAY=FR",
+      "SUMMARY:Logos Developer Office Hours",
+      "DESCRIPTION:Weekly office hours with the Logos engineering team.\\nJoin: " + OFFICE_HOURS_URL,
+      "URL:" + OFFICE_HOURS_URL,
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "logos-office-hours.ics";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div
-      className="col-span-6 md:col-span-4 rounded-[16px] p-gutter flex flex-col gap-4 overflow-hidden relative min-h-[200px] theme-dark"
-      style={{ background: "var(--color-dark-green)" }}
+      className="group col-span-6 md:col-span-4 rounded-[20px] p-gutter flex flex-col gap-6 overflow-hidden relative min-h-[360px]"
+      style={{ background: "var(--color-grey)" }}
     >
+      <span className="absolute top-gutter right-gutter h6 opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0">&rarr;</span>
       <div>
-        <span className="h5 sans block">Developer office hours</span>
-        <span className="body-tiny opacity-50 mt-1 block">Every Friday · 12:00 UTC</span>
+        <h4 className="h4 sans leading-tight">Developer office hours</h4>
+        <p className="body-small mono opacity-60 mt-2">Every Friday<br />12:00 UTC</p>
       </div>
 
-      {/* Live indicator or Countdown */}
       {cd && (
         live ? (
-          <div className="flex items-center gap-2 mt-auto">
+          <div className="flex items-center gap-2">
             <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-600 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-600" />
             </span>
             <span className="h4 sans">Live Now</span>
           </div>
         ) : (
-          <div className="flex gap-3 mt-auto">
+          <div className="flex gap-6">
             {[
               { val: cd.d, label: "days" },
               { val: cd.h, label: "hrs" },
               { val: cd.m, label: "min" },
               { val: cd.s, label: "sec" },
             ].map(({ val, label }) => (
-              <div key={label} className="flex flex-col items-center">
+              <div key={label} className="flex flex-col items-start">
                 <span className="h4 sans tabular-nums" style={{ fontVariantNumeric: "tabular-nums" }}>
                   {pad(val)}
                 </span>
-                <span className="body-tiny opacity-40">{label}</span>
+                <span className="font-mono text-[10px] tracking-[0.15em] uppercase opacity-50 mt-1">{label}</span>
               </div>
             ))}
           </div>
@@ -110,41 +162,11 @@ function OfficeHoursCard() {
             target="_blank"
             onClick={() => trackEvent("office_hours_join_call", { source: asPath })}
           >
-            <Button as="span" arrow>
-              Join Call
-            </Button>
+            <PillButton>Join Call</PillButton>
           </Link>
         )}
-        <button
-          onClick={() => {
-            trackEvent("office_hours_add_calendar", { source: asPath });
-            const ics = [
-              "BEGIN:VCALENDAR",
-              "VERSION:2.0",
-              "PRODID:-//Logos//Office Hours//EN",
-              "BEGIN:VEVENT",
-              "DTSTART:20250328T120000Z",
-              "DTEND:20250328T130000Z",
-              "RRULE:FREQ=WEEKLY;BYDAY=FR",
-              "SUMMARY:Logos Developer Office Hours",
-              "DESCRIPTION:Weekly office hours with the Logos engineering team.\\nJoin: " + OFFICE_HOURS_URL,
-              "URL:" + OFFICE_HOURS_URL,
-              "END:VEVENT",
-              "END:VCALENDAR",
-            ].join("\r\n");
-            const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "logos-office-hours.ics";
-            a.click();
-            URL.revokeObjectURL(url);
-          }}
-          className="cursor-pointer"
-        >
-          <Button as="span" arrow>
-            Add to Calendar
-          </Button>
+        <button onClick={downloadIcs} className="cursor-pointer">
+          <PillButton>Add to Calendar</PillButton>
         </button>
       </div>
     </div>
@@ -204,59 +226,6 @@ function SampleAppsModal({ open, onClose }: { open: boolean; onClose: () => void
   );
 }
 
-/* ── Developer Support Modal ── */
-const SUPPORT_LINKS = [
-  { name: "Discord", desc: "Chat with the community and get real-time help.", url: "https://discord.gg/logosnetwork" },
-  { name: "X (Twitter)", desc: "Follow for announcements, updates and threads.", url: "https://x.com/Logos_network" },
-  { name: "Community Forum", desc: "Discuss research, ask questions and share ideas.", url: "https://forum.logos.co/" },
-  { name: "Research Forum", desc: "Deep-dive into Logos research topics and technical discussions.", url: "https://forum.research.logos.co/" },
-];
-
-function DevSupportModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  useEffect(() => {
-    if (open) {
-      const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-      document.addEventListener("keydown", onKey);
-      document.body.style.overflow = "hidden";
-      return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
-    }
-  }, [open, onClose]);
-
-  if (!open) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-margin" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/40" />
-      <div
-        className="relative bg-[var(--color-bg)] rounded-[16px] w-full max-w-[480px] p-8"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between mb-6">
-          <span className="h5 sans">Developer Support</span>
-          <button onClick={onClose} className="cursor-pointer p-1 rounded-full hover:bg-black/5 transition-colors" aria-label="Close">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-          </button>
-        </div>
-        <div className="space-y-3">
-          {SUPPORT_LINKS.map((link) => (
-            <Link
-              key={link.name}
-              to={link.url}
-              target="_blank"
-              className="group flex items-center justify-between p-4 rounded-[10px] border transition-colors hover:bg-main!"
-            >
-              <div>
-                <span className="h6 sans block">{link.name}</span>
-                <p className="body-tiny opacity-50 mt-1">{link.desc}</p>
-              </div>
-              <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-4">&rarr;</span>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /* ── Animated Modules Showcase ── */
 const MODULES = [
@@ -387,7 +356,6 @@ function ModulesShowcase() {
 export default function Home() {
   const { asPath } = useRouter();
   const [sampleAppsOpen, setSampleAppsOpen] = useState(false);
-  const [devSupportOpen, setDevSupportOpen] = useState(false);
 
   const trackClick = (eventName: string) => () => {
     trackEvent(eventName, { source: asPath });
@@ -523,33 +491,31 @@ export default function Home() {
                           label: "Build",
                           desc: "Docs, scaffolds, sample apps and workshops.",
                           href: "#build",
-                          bg: "var(--color-grey)",
+                          bg: "var(--color-dark-green)",
+                          dark: true,
                         },
                         {
                           num: "04",
                           label: "Get Support",
                           desc: "Prizes, RFPs, office hours and contributors.",
                           href: "#get-support",
-                          bg: "var(--color-dark-green)",
-                          dark: true,
+                          bg: "var(--color-grey)",
                         },
                       ].map((card) => (
                         <Link
                           key={card.num}
                           to={card.href}
                           className={cx(
-                            "group rounded-[16px] p-gutter flex flex-col justify-between gap-6 min-h-[170px] transition-all hover:shadow-sm",
+                            "group relative rounded-[20px] p-gutter flex flex-col justify-between gap-6 min-h-[200px] transition-all hover:shadow-sm",
                             card.dark && "theme-dark"
                           )}
                           style={{ background: card.bg }}
                           onClick={trackClick(`hero_nav_${card.num}`)}
                         >
-                          <div className="flex items-start justify-between">
-                            <span className="font-mono text-[11px] tracking-[0.15em] opacity-50">{card.num}</span>
-                            <span className="h6 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity">&darr;</span>
-                          </div>
+                          <span className="absolute top-gutter right-gutter h6 opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0">&darr;</span>
+                          <span className="font-mono text-[11px] tracking-[0.15em] opacity-50">{card.num}</span>
                           <div>
-                            <span className="h5 sans transition-transform group-hover:-translate-y-0.5 block">{card.label}</span>
+                            <h4 className="h4 sans leading-tight">{card.label}</h4>
                             <p className="body-small mono opacity-60 mt-2">{card.desc}</p>
                           </div>
                         </Link>
@@ -561,7 +527,7 @@ export default function Home() {
             </section>
 
             {/*  Section 3: Builder Journey  */}
-            <section className="pt-half-v-space pb-half-v-space theme-default">
+            <section className="pt-v-space pb-v-space theme-default">
               <div className="mx-auto px-margin max-w-site-max-w-margin">
                 <ScrollEntrance className="flex items-baseline justify-between mb-v-space-sm">
                   <h2 className="h3 text-balance">Start your builder journey</h2>
@@ -592,21 +558,17 @@ export default function Home() {
                   <Link
                     to="https://github.com/logos-co/logos-basecamp/releases?q=prerelease%3Afalse&expanded=true"
                     target="_blank"
-                    className="group col-span-6 md:col-span-5 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[280px] flex flex-col"
+                    className="group col-span-6 md:col-span-6 rounded-[20px] overflow-hidden relative transition-all hover:shadow-sm min-h-[480px] flex flex-col"
                     style={{ background: "var(--color-light-blue)" }}
                     onClick={trackClick("install_logos_basecamp")}
                   >
-                    {/* App screenshot */}
-                    <div className="mx-gutter mt-gutter flex-1 overflow-hidden rounded-t-[12px] transition-transform group-hover:-translate-y-1">
-                      <img src="/basecamp.png" alt="Logos Basecamp" className="w-full h-full object-cover object-top" />
+                    <div className="relative aspect-[16/9] max-h-[260px] overflow-hidden" style={{ background: "var(--color-dark-green)" }}>
+                      <img src="/basecamp.png" alt="Logos Basecamp" className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.02]" />
                     </div>
-                    <div className="p-gutter">
-                      <div className="flex items-baseline justify-between">
-                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Install Logos Basecamp</span>
-                        <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
-                      </div>
-                      <p className="body-small mono opacity-60 mt-2">
-                        Leverage the interface to the parallel society and experiment with the applications available in the Alpha Release.
+                    <div className="flex-1 p-gutter flex flex-col items-center justify-center text-center gap-3">
+                      <h4 className="h4 sans leading-tight">Install Basecamp</h4>
+                      <p className="body-small mono opacity-60 max-w-[28em]">
+                        Logos Basecamp is a complete distribution that bundles the kernel, the default modules and UI packages into a usable interface. It allows you to easily interact with simple apps built on the various modules.
                       </p>
                     </div>
                   </Link>
@@ -615,13 +577,12 @@ export default function Home() {
                   <Link
                     to="https://github.com/logos-co/logos-docs/blob/main/docs/blockchain/quickstart-guide-for-the-logos-blockchain-node.md"
                     target="_blank"
-                    className="group col-span-6 md:col-span-7 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[280px] flex flex-col"
+                    className="group col-span-6 md:col-span-6 rounded-[20px] overflow-hidden relative transition-all hover:shadow-sm min-h-[480px] flex flex-col"
                     style={{ background: "var(--color-light-blue)" }}
                     onClick={trackClick("run_node_cli")}
                   >
-                    {/* Terminal mock */}
                     <div
-                      className="mx-gutter mt-gutter rounded-t-[8px] flex-1 flex flex-col overflow-hidden transition-transform group-hover:-translate-y-1 text-white"
+                      className="relative aspect-[16/9] max-h-[260px] flex flex-col overflow-hidden text-white"
                       style={{ background: "var(--color-dark-green)" }}
                     >
                       <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/5">
@@ -645,40 +606,33 @@ export default function Home() {
                         <p className="opacity-60 mt-2"><span className="opacity-40">$</span> <span className="inline-block w-[5px] h-[10px] bg-teal/70 opacity-0 group-hover:animate-blink" /></p>
                       </div>
                     </div>
-                    <div className="p-gutter">
-                      <div className="flex items-baseline justify-between">
-                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Run a Node using CLI</span>
-                        <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
-                      </div>
-                      <p className="body-small mono opacity-60 mt-2">
-                        Participate in the network by becoming a node operator. Connect to the testnet in minutes and engage with the protocol.
+                    <div className="flex-1 p-gutter flex flex-col items-center justify-center text-center gap-3">
+                      <h4 className="h4 sans leading-tight">Run a headless blockchain node using CLI</h4>
+                      <p className="body-small mono opacity-60 max-w-[28em]">
+                        Participate in the network by becoming a node operator. Connect to the testnet and engage with the protocol.
                       </p>
                     </div>
                   </Link>
 
                   {/*  PHASE 02: GET INSPIRED  */}
                   {/* Phase label  spans full width */}
-                  <div id="get-inspired" className="col-span-6 md:col-span-12 flex items-end gap-4 mt-gutter pb-2 scroll-mt-[calc(var(--spacing-header-height-expanded)+var(--spacing-gutter))]">
+                  <div id="get-inspired" className="col-span-6 md:col-span-12 flex items-end gap-4 mt-v-space-sm pb-2 scroll-mt-[calc(var(--spacing-header-height-expanded)+var(--spacing-gutter))]">
                     <span className="font-mono text-[3rem] md:text-[4.5rem] leading-none font-light opacity-[0.07] select-none">02</span>
                     <h3 className="h4 sans pb-1">Get Inspired</h3>
                     <div className="flex-1 h-px bg-current opacity-10 mb-3" />
                   </div>
 
-                  {/* Featured card  community ideas */}
+                  {/* Featured card  community ideas — visual on top, centered text below (Participate-style) */}
                   <Link
                     to="https://github.com/logos-co/ideas"
                     target="_blank"
-                    className="group col-span-6 md:col-span-7 rounded-[16px] p-gutter flex flex-col justify-between gap-6 overflow-hidden relative transition-all hover:shadow-sm min-h-[280px]"
-                    style={{ background: "var(--color-tan)" }}
+                    className="group col-span-6 md:col-span-6 rounded-[40px] md:rounded-[240px] overflow-hidden relative transition-all hover:shadow-sm min-h-[480px] flex flex-col border-1"
+                    style={{ borderColor: "var(--color-tan)" }}
                     onClick={trackClick("explore_community_ideas")}
                   >
-                    <div className="flex items-baseline justify-between">
-                      <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Explore community ideas</span>
-                      <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-4px] group-hover:translate-x-0 transition-transform">&rarr;</span>
-                    </div>
                     {/* Mini idea cards with scrolling on hover */}
-                    <div className="relative flex-1 flex items-center overflow-hidden hover-start">
-                      <div className="flex gap-2 shrink-0 animate-scroll-left">
+                    <div className="relative aspect-[16/9] max-h-[260px] flex items-center overflow-hidden hover-start">
+                      <div className="flex gap-2 shrink-0 animate-scroll-left px-3">
                         {[
                           { title: "Privacy-preserving location tracker", tag: "Privacy" },
                           { title: "Decentralized hiring platform", tag: "Social" },
@@ -695,80 +649,94 @@ export default function Home() {
                         ].map((idea, i) => (
                           <div
                             key={`${idea.title}-${i}`}
-                            className="w-[260px] h-[120px] shrink-0 rounded-[8px] bg-bg/50 p-3 flex flex-col justify-between gap-3"
+                            className="w-[200px] h-[100px] shrink-0 rounded-[8px] p-3 flex flex-col justify-between gap-3"
+                            style={{ background: "var(--color-tan)" }}
                           >
                             <p className="body-tiny font-medium leading-tight line-clamp-3">{idea.title}</p>
                             <span className="body-tiny opacity-60 px-1.5 py-0.5 rounded-full bg-current/5 self-start">{idea.tag}</span>
                           </div>
                         ))}
                       </div>
-                      {/* Fade edges */}
                       <div
                         className="absolute top-0 left-0 w-8 h-full pointer-events-none z-[1]"
-                        style={{ background: "linear-gradient(to right, var(--color-tan), transparent)" }}
+                        style={{ background: "linear-gradient(to right, var(--color-bg), transparent)" }}
                       />
                       <div
                         className="absolute top-0 right-0 w-16 h-full pointer-events-none z-[1]"
-                        style={{ background: "linear-gradient(to right, transparent, var(--color-tan))" }}
+                        style={{ background: "linear-gradient(to right, transparent, var(--color-bg))" }}
                       />
                     </div>
-                    <p className="body-small mono opacity-60 max-w-[28em]">
-                      Browse ideas from the community, vote on the ones you love, or propose your own.
-                    </p>
+                    <div
+                      className="flex-1 p-gutter flex flex-col items-center justify-center text-center gap-3"
+                      style={{ background: "var(--color-tan)" }}
+                    >
+                      <h4 className="h4 sans leading-tight">Explore community ideas</h4>
+                      <p className="body-small mono opacity-60 max-w-[28em]">
+                        Browse ideas from the community or propose your own idea to inspire builders.
+                      </p>
+                    </div>
                   </Link>
 
-                  {/* Start contributing */}
+                  {/* Start contributing — visual on top, centered text below (Participate-style) */}
                   <Link
                     to="/contribute"
-                    className="group col-span-6 md:col-span-5 rounded-[16px] p-gutter flex flex-col justify-between gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[280px]"
-                    style={{ background: "var(--color-tan)" }}
+                    className="group col-span-6 md:col-span-6 rounded-[20px] overflow-hidden relative transition-all hover:shadow-sm min-h-[480px] flex flex-col border-1"
+                    style={{ borderColor: "var(--color-tan)" }}
                     onClick={trackClick("start_contributing_github_issues")}
                   >
-                    <div className="flex items-baseline justify-between">
-                      <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Start contributing with GitHub issues</span>
-                      <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity translate-x-[-4px] group-hover:translate-x-0 transition-transform">&rarr;</span>
-                    </div>
                     {/* Mini issue board mockup */}
-                    <div className="flex-1 flex flex-col rounded-[8px] border border-current/10 overflow-hidden font-mono text-[10px]">
-                      {/* Toolbar */}
-                      <div className="flex items-center gap-2 px-2.5 py-1.5 bg-current/[0.03] border-b border-current/10">
-                        <span className="px-1.5 py-0.5 rounded bg-dark-green text-bg text-[9px]">All</span>
-                        <span className="h-1.5 w-14 rounded-full bg-current/10" />
-                        <span className="h-1.5 w-16 rounded-full bg-current/10" />
-                        <span className="h-1.5 w-12 rounded-full bg-current/10" />
-                      </div>
-                      {/* Issue rows */}
-                      {[
-                        { w: "w-[70%]", r: "w-10", tint: true },
-                        { w: "w-[55%]", r: "w-12", tint: false },
-                        { w: "w-[65%]", r: "w-10", tint: false },
-                        { w: "w-[50%]", r: "w-14", tint: false },
-                        { w: "w-[60%]", r: "w-10", tint: false },
-                      ].map((row, i) => (
-                        <div
-                          key={i}
-                          className={`flex items-center gap-2 px-2.5 py-1.5 border-b border-current/5 transition-all ${i === 0 ? "group-hover:bg-current/[0.04]" : ""}`}
-                          style={{ transitionDelay: `${i * 60}ms` }}
-                        >
-                          <svg width="8" height="8" viewBox="0 0 16 16" fill="none" className="opacity-30 shrink-0">
-                            <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-                            <circle cx="8" cy="8" r="2" fill="currentColor" />
-                          </svg>
-                          <span
-                            className={`h-1.5 ${row.w} rounded-full transition-opacity group-hover:opacity-80 ${row.tint ? "bg-teal/25" : "bg-current/10"}`}
-                            style={{ transitionDelay: `${i * 60}ms` }}
-                          />
-                          <span className={`ml-auto h-1.5 ${row.r} rounded-full bg-current/5 shrink-0`} />
+                    <div
+                      className="relative aspect-[16/9] max-h-[260px] flex flex-col overflow-hidden font-mono text-[10px]"
+                      style={{ background: "var(--color-tan)" }}
+                    >
+                      <div className="flex flex-col mx-gutter mt-gutter mb-0 rounded-[8px] border border-current/10 overflow-hidden flex-1 bg-bg/30">
+
+                        {/* Toolbar */}
+                        <div className="flex items-center gap-2 px-2.5 py-1.5 bg-current/[0.03] border-b border-current/10">
+                          <span className="px-1.5 py-0.5 rounded bg-dark-green text-bg text-[9px]">All</span>
+                          <span className="h-1.5 w-14 rounded-full bg-current/10" />
+                          <span className="h-1.5 w-16 rounded-full bg-current/10" />
+                          <span className="h-1.5 w-12 rounded-full bg-current/10" />
                         </div>
-                      ))}
+                        {/* Issue rows */}
+                        {[
+                          { w: "w-[70%]", r: "w-10", tint: true },
+                          { w: "w-[55%]", r: "w-12", tint: false },
+                          { w: "w-[65%]", r: "w-10", tint: false },
+                          { w: "w-[50%]", r: "w-14", tint: false },
+                          { w: "w-[60%]", r: "w-10", tint: false },
+                        ].map((row, i) => (
+                          <div
+                            key={i}
+                            className={`flex items-center gap-2 px-2.5 py-1.5 border-b border-current/5 transition-all ${i === 0 ? "group-hover:bg-current/[0.04]" : ""}`}
+                            style={{ transitionDelay: `${i * 60}ms` }}
+                          >
+                            <svg width="8" height="8" viewBox="0 0 16 16" fill="none" className="opacity-30 shrink-0">
+                              <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
+                              <circle cx="8" cy="8" r="2" fill="currentColor" />
+                            </svg>
+                            <span
+                              className={`h-1.5 ${row.w} rounded-full transition-opacity group-hover:opacity-80 ${row.tint ? "bg-teal/25" : "bg-current/10"}`}
+                              style={{ transitionDelay: `${i * 60}ms` }}
+                            />
+                            <span className={`ml-auto h-1.5 ${row.r} rounded-full bg-current/5 shrink-0`} />
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    <p className="body-small mono opacity-60 max-w-[28em]">
-                      Pick up a good first issue and ship your first PR.
-                    </p>
+                    <div
+                      className="flex-1 p-gutter flex flex-col items-center justify-center text-center gap-3"
+                      style={{ background: "var(--color-tan)" }}
+                    >
+                      <h4 className="h4 sans leading-tight">Start contributing with GitHub issues</h4>
+                      <p className="body-small mono opacity-60 max-w-[28em]">
+                        Pick up a good first issue and explore the various avenues for contribution.
+                      </p>
+                    </div>
                   </Link>
 
                   {/*  PHASE 03: BUILD  */}
-                  <div id="build" className="col-span-6 md:col-span-12 flex items-end gap-4 mt-gutter pb-2 scroll-mt-[calc(var(--spacing-header-height-expanded)+var(--spacing-gutter))]">
+                  <div id="build" className="col-span-6 md:col-span-12 flex items-end gap-4 mt-v-space-sm pb-2 scroll-mt-[calc(var(--spacing-header-height-expanded)+var(--spacing-gutter))]">
                     <span className="font-mono text-[3rem] md:text-[4.5rem] leading-none font-light opacity-[0.07] select-none">03</span>
                     <h3 className="h4 sans pb-1">Build</h3>
                     <div className="flex-1 h-px bg-current opacity-10 mb-3" />
@@ -778,195 +746,215 @@ export default function Home() {
                   <Link
                     to="https://github.com/logos-co/logos-docs"
                     target="_blank"
-                    className="group col-span-6 md:col-span-4 md:row-span-2 rounded-[16px] p-gutter flex flex-col justify-between overflow-hidden relative transition-all hover:shadow-sm min-h-[200px]"
-                    style={{ background: "var(--color-grey)" }}
+                    className="group col-span-6 md:col-span-4 md:row-span-2 rounded-[20px] p-gutter flex flex-col justify-between overflow-hidden relative transition-all hover:shadow-sm min-h-[280px] theme-dark"
+                    style={{ background: "var(--color-dark-green)" }}
                     onClick={trackClick("read_the_docs")}
                   >
+                    <span className="absolute top-gutter right-gutter h6 opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0">&rarr;</span>
                     <div>
-                      <div className="flex items-baseline justify-between mb-6">
-                        <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Read the Docs</span>
-                        <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
-                      </div>
-                      <p className="body-small mono opacity-60 max-w-[24em]">
+                      <h4 className="h4 sans leading-tight">Read the Docs</h4>
+                      <p className="body-small mono opacity-60 mt-2 max-w-[24em]">
                         Deep-dive into the Logos stack  architecture, modules, APIs and integration guides.
                       </p>
                     </div>
                     {/* Code snippet visual */}
-                    <div className="font-mono text-[10px] opacity-20 space-y-1 mt-8 transition-opacity group-hover:opacity-35">
+                    <div className="font-mono text-[10px] opacity-20 space-y-1 my-6 transition-opacity group-hover:opacity-35">
                       <p>{"import { Blockchain } from '@logos/blockchain'"}</p>
                       <p>{"import { Storage } from '@logos/storage'"}</p>
                       <p>{"import { Messaging } from '@logos/messaging'"}</p>
                       <p className="opacity-50">{"// Build something great"}</p>
                     </div>
+                    <PillButton variant="light">Read Docs</PillButton>
                   </Link>
 
                   {/* Scaffold */}
                   <Link
                     to="https://github.com/logos-co/logos-scaffold"
                     target="_blank"
-                    className="group col-span-3 md:col-span-4 rounded-[16px] p-gutter flex flex-col justify-between gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[140px]"
-                    style={{ background: "var(--color-grey)" }}
+                    className="group col-span-3 md:col-span-4 rounded-[20px] p-gutter flex flex-col gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[220px] theme-dark"
+                    style={{ background: "var(--color-dark-green)" }}
                     onClick={trackClick("scaffold_boilerplate")}
                   >
-                    <div className="flex items-baseline justify-between">
-                      <span className="h6 sans transition-transform group-hover:-translate-y-0.5">Scaffold boilerplate</span>
-                      <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
+                    <span className="absolute top-gutter right-gutter h6 opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0">&rarr;</span>
+                    <div>
+                      <h4 className="h4 sans leading-tight">Scaffold boilerplate</h4>
+                      <p className="body-small mono opacity-50 mt-2">
+                        Start with a boilerplate.
+                      </p>
                     </div>
-                    <p className="body-small mono opacity-50">
-                      Start with a boilerplate.
-                    </p>
+                    <span className="mt-auto"><PillButton variant="light">Get Started</PillButton></span>
                   </Link>
 
                   {/* Sample apps */}
                   <button
-                    className="group col-span-3 md:col-span-4 rounded-[16px] p-gutter flex flex-col justify-between gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[140px] text-left cursor-pointer"
-                    style={{ background: "var(--color-grey)" }}
+                    className="group col-span-3 md:col-span-4 rounded-[20px] p-gutter flex flex-col gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[220px] text-left cursor-pointer theme-dark"
+                    style={{ background: "var(--color-dark-green)" }}
                     onClick={() => {
                       setSampleAppsOpen(true);
                       trackClick("sample_apps")();
                     }}
                   >
-                    <div className="flex items-baseline justify-between w-full">
-                      <span className="h6 sans transition-transform group-hover:-translate-y-0.5">Sample apps</span>
-                      <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
+                    <span className="absolute top-gutter right-gutter h6 opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0">&rarr;</span>
+                    <div>
+                      <h4 className="h4 sans leading-tight">Sample apps</h4>
+                      <p className="body-small mono opacity-50 mt-2">
+                        Real-world examples to learn from.
+                      </p>
                     </div>
-                    <p className="body-small mono opacity-50 mt-auto">
-                      Real-world examples to learn from.
-                    </p>
+                    <span className="mt-auto"><PillButton variant="light">Browse</PillButton></span>
                   </button>
 
                   {/* Workshops & Tutorials */}
                   <Link
                     to="https://www.youtube.com/@LogosNetwork"
                     target="_blank"
-                    className="group col-span-3 md:col-span-4 rounded-[16px] overflow-hidden relative transition-all hover:shadow-sm min-h-[140px] flex flex-col text-white"
+                    className="group col-span-3 md:col-span-4 rounded-[20px] overflow-hidden relative transition-all hover:shadow-sm min-h-[220px] flex flex-col text-white"
                     onClick={trackClick("workshops_tutorials")}
                   >
-                    {/* GIF background */}
                     <img
                       src="/workshop.gif"
                       alt=""
                       className="absolute inset-0 w-full h-full object-cover"
                     />
-                    {/* Dark overlay for text readability */}
                     <div className="absolute inset-0 bg-black/50" />
-                    <div className="relative z-[1] p-gutter flex flex-col justify-between flex-1 gap-6">
-                      <div className="flex items-baseline justify-between">
-                        <span className="h6 sans transition-transform group-hover:-translate-y-0.5">Workshops &amp; tutorials</span>
-                        <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
+                    <span className="absolute top-gutter right-gutter z-[2] h6 opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0">&rarr;</span>
+                    <div className="relative z-[1] p-gutter flex flex-col flex-1 gap-4">
+                      <div>
+                        <h4 className="h4 sans leading-tight">Workshops &amp; tutorials</h4>
+                        <p className="body-small mono opacity-70 mt-2">
+                          Live coding sessions and step-by-step guides.
+                        </p>
                       </div>
-                      <p className="body-small mono opacity-70">
-                        Live coding sessions and step-by-step guides.
-                      </p>
+                      <span className="mt-auto"><PillButton variant="light">Watch</PillButton></span>
                     </div>
                   </Link>
 
-                  {/* Developer support */}
-                  <button
-                    className="cursor-pointer group col-span-3 md:col-span-4 rounded-[16px] p-gutter flex flex-col justify-between gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[140px] text-left"
-                    style={{ background: "var(--color-grey)" }}
-                    onClick={() => {
-                      setDevSupportOpen(true);
-                      trackClick("developer_support")();
-                    }}
+                  {/* Discord community */}
+                  <Link
+                    to="https://discord.gg/logosnetwork"
+                    target="_blank"
+                    className="group col-span-3 md:col-span-4 rounded-[20px] p-gutter flex flex-col gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[220px] theme-dark"
+                    style={{ background: "var(--color-dark-green)" }}
+                    onClick={trackClick("build_discord_community")}
                   >
-                    <div className="flex items-baseline justify-between w-full">
-                      <span className="h6 sans transition-transform group-hover:-translate-y-0.5">Developer support</span>
-                      <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
+                    <span className="absolute top-gutter right-gutter h6 opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0">&rarr;</span>
+                    <div>
+                      <h4 className="h4 sans leading-tight">Discord community</h4>
+                      <p className="body-small mono opacity-50 mt-2">
+                        Chat with fellow builders and get real-time help.
+                      </p>
                     </div>
-                    <p className="body-small mono opacity-50">
-                      Discord, X, community forum and the research forum.
-                    </p>
-                  </button>
-                  <DevSupportModal open={devSupportOpen} onClose={() => setDevSupportOpen(false)} />
+                    <span className="mt-auto"><PillButton variant="light">Join</PillButton></span>
+                  </Link>
 
                   {/*  PHASE 04: GET SUPPORT  */}
-                  <div id="get-support" className="col-span-6 md:col-span-12 flex items-end gap-4 mt-gutter pb-2 scroll-mt-[calc(var(--spacing-header-height-expanded)+var(--spacing-gutter))]">
+                  <div id="get-support" className="col-span-6 md:col-span-12 flex items-end gap-4 mt-v-space-sm pb-2 scroll-mt-[calc(var(--spacing-header-height-expanded)+var(--spacing-gutter))]">
                     <span className="font-mono text-[3rem] md:text-[4.5rem] leading-none font-light opacity-[0.07] select-none">04</span>
                     <h3 className="h4 sans pb-1">Get Support</h3>
                     <div className="flex-1 h-px bg-current opacity-10 mb-3" />
                   </div>
 
-                  {/* Prizes  premium card */}
+                  {/* λ Prize  hero card with image background */}
                   <Link
                     to="/prize"
-                    className="group col-span-6 rounded-[16px] p-gutter flex flex-col justify-between gap-12 overflow-hidden relative transition-all hover:shadow-sm min-h-[240px] theme-dark"
-                    style={{ background: "var(--color-dark-green)" }}
+                    className="group col-span-6 rounded-[20px] overflow-hidden relative min-h-[420px] flex flex-col justify-center items-center text-center transition-all hover:shadow-sm theme-dark"
                     onClick={trackClick("prizes")}
                   >
-                    <div className="flex items-baseline justify-between">
-                      <span className="h4 sans transition-transform group-hover:-translate-y-0.5 flex items-center gap-2"><img src="/mark.svg" alt="" className="h-[0.7em] brightness-0 invert" />Prizes</span>
-                      <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
-                    </div>
-                    <div>
-                      <p className="body-small mono opacity-40 max-w-[24em]">
-                        Compete for prizes by building on the Logos execution layer. Ship code and win support.
+                    <img
+                      src="/lprize.png"
+                      alt=""
+                      aria-hidden="true"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                    />
+                    <div className="absolute inset-0 bg-black/30" />
+                    <span className="absolute top-gutter right-gutter z-[2] h6 opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0">&rarr;</span>
+                    <div className="relative z-[1] flex flex-col items-center gap-6 p-gutter max-w-[34em]">
+                      <h3 className="h2 leading-none flex items-center gap-3">
+                        <img
+                          src="/mark.svg"
+                          alt=""
+                          aria-hidden="true"
+                          className="h-[0.85em] w-auto brightness-0 invert"
+                        />
+                        Prize
+                      </h3>
+                      <p className="h5 sans opacity-90">
+                        The frontier is open. Build what&apos;s next.
+                      </p>
+                      <p className="body-small mono opacity-70 max-w-[28em]">
+                        Lambda Prizes is a competitive prize framework for the Logos ecosystem. &lambda;Prize targets contributions where Logos cares about the outcome but not the path.
                       </p>
                     </div>
-                    {/* Large mark watermark */}
-                    <img src="/mark.svg" alt="" className="absolute -bottom-8 -right-8 w-[14rem] select-none opacity-[0.06] brightness-0 invert transition-transform group-hover:scale-110 group-hover:-translate-y-2" />
-                    {/* Floating orbs */}
-                    <div className="absolute top-8 right-8 w-20 h-20 rounded-full border border-white/[0.06] transition-transform group-hover:scale-110" />
-                    <div className="absolute top-16 right-20 w-8 h-8 rounded-full bg-teal/10 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
                   </Link>
 
-                  {/* RFPs  premium card */}
+                  {/* Explore RFPs  hero card */}
                   <Link
                     to="/rfp"
-                    className="group col-span-6 rounded-[16px] p-gutter flex flex-col justify-between gap-12 overflow-hidden relative transition-all hover:shadow-sm min-h-[240px] theme-dark"
-                    style={{ background: "var(--color-dark-green)" }}
+                    className="group col-span-6 rounded-[20px] overflow-hidden relative min-h-[420px] flex flex-col justify-center items-center text-center transition-all hover:shadow-sm"
                     onClick={trackClick("explore_rfps")}
-                    >
-                    <div className="flex items-baseline justify-between">
-                      <span className="h4 sans transition-transform group-hover:-translate-y-0.5">Explore RFPs</span>
-                      <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
-                    </div>
-                    <div>
-                      <p className="body-small mono opacity-60 max-w-[24em]">
-                        Apply for supported proposals. The Logos RFP Program backs developers building on the stack.
+                  >
+                    <img
+                      src="/gradient-2.png"
+                      alt=""
+                      aria-hidden="true"
+                      className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl transition-transform duration-700 group-hover:scale-[1.18]"
+                    />
+                    <span className="absolute top-gutter right-gutter z-[2] h6 opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0">&rarr;</span>
+                    <div className="relative z-[1] flex flex-col items-center gap-6 p-gutter max-w-[34em]">
+                      <h3 className="h2 leading-none flex items-center gap-3">
+                        <span
+                          aria-hidden="true"
+                          className="block h-[0.85em] w-[0.65em]"
+                          style={{
+                            background: "currentColor",
+                            WebkitMaskImage: "url(/mark.svg)",
+                            maskImage: "url(/mark.svg)",
+                            WebkitMaskRepeat: "no-repeat",
+                            maskRepeat: "no-repeat",
+                            WebkitMaskPosition: "center",
+                            maskPosition: "center",
+                            WebkitMaskSize: "contain",
+                            maskSize: "contain",
+                          }}
+                        />
+                        RFPs
+                      </h3>
+                      <p className="h5 sans opacity-90">
+                        Get supported to build on the stack.
+                      </p>
+                      <p className="body-small mono opacity-70 max-w-[28em]">
+                        The Logos RFP Program supports developers to build applications on the Logos Stack. Browse all open requests for proposals.
                       </p>
                     </div>
-                    {/* Decorative layers */}
-                    <div className="absolute top-6 right-6 w-24 h-16 rounded-[8px] border border-current/[0.06] rotate-3 transition-transform group-hover:rotate-6 group-hover:-translate-y-1" />
-                    <div className="absolute top-10 right-10 w-24 h-16 rounded-[8px] border border-current/[0.04] -rotate-2 transition-transform group-hover:-rotate-4 group-hover:translate-y-1" />
-                    <div className="absolute top-14 right-14 w-24 h-16 rounded-[8px] bg-current/[0.02] transition-transform group-hover:translate-x-1" />
                   </Link>
 
                   {/* Developer Office Hours */}
                   <OfficeHoursCard />
 
-                  {/* Speak to a Core Contributor */}
-                  <Link
-                    to="https://cal.com/team/logos-onboarding/intro"
-                    target="_blank"
-                    className="group col-span-6 md:col-span-4 rounded-[16px] p-gutter flex flex-col gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[200px] theme-dark"
-                    style={{ background: "var(--color-dark-green)" }}
-                    onClick={trackClick("speak_to_core_contributor")}
-                  >
-                    <div className="flex items-baseline justify-between">
-                      <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Speak to a core contributor</span>
-                      <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
-                    </div>
-                    <p className="body-small mono opacity-60 mt-auto">
-                      Get direct guidance from the people building the Logos stack.
-                    </p>
-                  </Link>
-
                   {/* Logos Community Forum */}
                   <Link
                     to="https://forum.logos.co/"
                     target="_blank"
-                    className="group col-span-6 md:col-span-4 rounded-[16px] p-gutter flex flex-col gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[200px] theme-dark"
-                    style={{ background: "var(--color-dark-green)" }}
+                    className="group col-span-6 md:col-span-4 rounded-[20px] p-gutter flex flex-col gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[360px]"
+                    style={{ background: "var(--color-grey)" }}
                     onClick={trackClick("logos_community_forum")}
                   >
-                    <div className="flex items-baseline justify-between">
-                      <span className="h5 sans transition-transform group-hover:-translate-y-0.5">Logos community forum</span>
-                      <span className="h6 opacity-0 group-hover:opacity-100 transition-opacity">&rarr;</span>
-                    </div>
-                    <p className="body-small mono opacity-60 mt-auto">
-                      Discuss research, ask technical questions and connect with the broader Logos community.
-                    </p>
+                    <span className="absolute top-gutter right-gutter h6 opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0">&rarr;</span>
+                    <h4 className="h4 sans leading-tight">Logos Community Forum</h4>
+                    <span className="mt-auto"><PillButton>Learn More</PillButton></span>
+                  </Link>
+
+                  {/* Schedule a call with a contributor */}
+                  <Link
+                    to="https://cal.com/team/logos-onboarding/intro"
+                    target="_blank"
+                    className="group col-span-6 md:col-span-4 rounded-[20px] p-gutter flex flex-col gap-4 overflow-hidden relative transition-all hover:shadow-sm min-h-[360px]"
+                    style={{ background: "var(--color-grey)" }}
+                    onClick={trackClick("speak_to_core_contributor")}
+                  >
+                    <span className="absolute top-gutter right-gutter h6 opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0">&rarr;</span>
+                    <h4 className="h4 sans leading-tight">Schedule a call and speak with a contributor</h4>
+                    <span className="mt-auto"><PillButton>Learn More</PillButton></span>
                   </Link>
 
                 </ScrollEntrance>
@@ -975,7 +963,7 @@ export default function Home() {
 
             {/*  Section 5: Manifesto Quote (full-bleed)  */}
             <section
-              className="relative overflow-hidden text-[#F3EFE0] bg-cover bg-center"
+              className="relative overflow-hidden text-[#F3EFE0] bg-cover bg-center mt-v-space"
               style={{ backgroundImage: "url(/hero-gradient-1.png)" }}
             >
               {/* Blend into footer green */}
@@ -987,7 +975,7 @@ export default function Home() {
                 }}
               />
               <div className="relative mx-auto px-margin max-w-site-max-w-margin py-v-space-sm md:py-v-space">
-                <div className="grid grid-cols-12 gap-gutter min-h-[320px] md:min-h-[420px]">
+                <div className="grid grid-cols-12 gap-gutter min-h-[360px] md:min-h-[420px]">
                   <blockquote className="col-span-12 md:col-span-7 lg:col-span-6 flex flex-col justify-between gap-v-space-sm">
                     <p className="h2 md:h1 leading-[1.04] text-balance">
                       We are at the critical juncture where the old system meets the new <em className="italic">tools</em> built to replace it.
