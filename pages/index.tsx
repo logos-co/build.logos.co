@@ -405,7 +405,7 @@ export default function Home() {
               />
               <AnimatedMark
                 className="hidden md:block pointer-events-none select-none absolute aspect-[20/26] opacity-[0.22]
-                           md:right-[10vw] md:-bottom-[6vw] md:w-[52vw] md:max-w-[720px]"
+                           md:right-[8vw] md:bottom-v-space md:w-[50vw] md:max-w-[700px]"
               />
 
               <div className="relative mx-auto px-margin md:px-[calc(var(--spacing-margin)*1.5)] max-w-site-max-w-margin">
