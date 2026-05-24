@@ -556,7 +556,7 @@ export default function Home() {
 
                   {/* Install Basecamp  with app preview */}
                   <Link
-                    to="https://github.com/logos-co/logos-basecamp/releases?q=prerelease%3Afalse&expanded=true"
+                    to="https://github.com/logos-co/logos-basecamp/releases/tag/0.1.2"
                     target="_blank"
                     className="group col-span-6 md:col-span-6 rounded-[20px] overflow-hidden relative transition-all hover:shadow-sm min-h-[480px] flex flex-col"
                     style={{ background: "var(--color-light-blue)" }}
