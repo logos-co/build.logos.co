@@ -40,7 +40,7 @@ const footerLists = [
     links: [
       { label: "Twitter", to: "https://x.com/Logos_network", external: true },
       { label: "Discord", to: "https://discord.gg/logosnetwork", external: true },
-      { label: "YouTube", to: "https://www.youtube.com/@LogosNetwork", external: true },
+      { label: "YouTube", to: "https://www.youtube.com/@Logos_network", external: true },
       { label: "Blog", to: "https://press.logos.co/", external: true },
       { label: "GitHub", to: "https://github.com/logos-co", external: true },
     ],

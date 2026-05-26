@@ -575,7 +575,7 @@ export default function Home() {
 
                   {/* Run a Node  terminal style */}
                   <Link
-                    to="https://github.com/logos-co/logos-docs/blob/main/docs/blockchain/quickstart-guide-for-the-logos-blockchain-node.md"
+                    to="https://github.com/logos-co/logos-docs/blob/main/docs/blockchain/run-a-logos-blockchain-node-from-cli.md"
                     target="_blank"
                     className="group col-span-6 md:col-span-6 rounded-[20px] overflow-hidden relative transition-all hover:shadow-sm min-h-[480px] flex flex-col"
                     style={{ background: "var(--color-light-blue)" }}
@@ -806,7 +806,7 @@ export default function Home() {
 
                   {/* Workshops & Tutorials */}
                   <Link
-                    to="https://www.youtube.com/@LogosNetwork"
+                    to="https://www.youtube.com/@Logos_network"
                     target="_blank"
                     className="group col-span-3 md:col-span-4 rounded-[20px] overflow-hidden relative transition-all hover:shadow-sm min-h-[220px] flex flex-col text-white"
                     onClick={trackClick("workshops_tutorials")}
@@ -866,7 +866,7 @@ export default function Home() {
                       aria-hidden="true"
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                     />
-                    <div className="absolute inset-0 bg-black/30" />
+                    <div className="absolute inset-0 bg-black/55" />
                     <span className="absolute top-gutter right-gutter z-[2] h6 opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0">&rarr;</span>
                     <div className="relative z-[1] flex flex-col items-center gap-6 p-gutter max-w-[34em]">
                       <h3 className="h2 leading-none flex items-center gap-3">
@@ -899,6 +899,7 @@ export default function Home() {
                       aria-hidden="true"
                       className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl transition-transform duration-700 group-hover:scale-[1.18]"
                     />
+                    <div className="absolute inset-0" style={{ background: "color-mix(in srgb, var(--color-bg) 40%, transparent)" }} />
                     <span className="absolute top-gutter right-gutter z-[2] h6 opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0">&rarr;</span>
                     <div className="relative z-[1] flex flex-col items-center gap-6 p-gutter max-w-[34em]">
                       <h3 className="h2 leading-none flex items-center gap-3">
@@ -920,10 +921,10 @@ export default function Home() {
                         RFPs
                       </h3>
                       <p className="h5 sans opacity-90">
-                        Get supported to build on the stack.
+                        Build on the stack, under contract.
                       </p>
-                      <p className="body-small mono opacity-70 max-w-[28em]">
-                        The Logos RFP Program supports developers to build applications on the Logos Stack. Browse all open requests for proposals.
+                      <p className="body-small mono opacity-80 max-w-[28em]">
+                        The Logos RFP Program contracts developers to ship work on the Logos Stack &mdash; apps, infrastructure and beyond. Browse all open requests for proposals to find a paid opportunity.
                       </p>
                     </div>
                   </Link>
