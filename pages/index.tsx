@@ -575,7 +575,7 @@ export default function Home() {
 
                   {/* Run a Node  terminal style */}
                   <Link
-                    to="https://github.com/logos-co/logos-docs/blob/main/docs/blockchain/run-a-logos-blockchain-node-from-cli.md"
+                    to="https://github.com/logos-co/logos-docs/blob/main/docs/blockchain/get-started/run-a-logos-blockchain-node-from-cli.md"
                     target="_blank"
                     className="group col-span-6 md:col-span-6 rounded-[20px] overflow-hidden relative transition-all hover:shadow-sm min-h-[480px] flex flex-col"
                     style={{ background: "var(--color-light-blue)" }}
